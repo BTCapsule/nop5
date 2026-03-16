@@ -2,6 +2,8 @@
 
 Node on Phone: a drivechain enabled mobile wallet
 
+For testing only. Uses tunnelmole to create a quick remote url. You must be on a separate Wifi network than your PC. Onion wallet over tor coming soon
+
 # Setup
 
 ## 1. Install Node.js (via NVM)
