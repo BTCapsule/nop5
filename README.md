@@ -1,6 +1,6 @@
-# nop5
+# NOP5
 
-A drivechain enabled mobile wallet
+Node on Phone: a drivechain enabled mobile wallet
 
 # Setup
 
