@@ -1248,7 +1248,7 @@ requestNewAddress('get_new_shielded_address');
 
 // Function to request addresses from your gRPC backend
 function requestNewAddress(method) {
-    grpcCall(method, {}, (err, data) => {
+    zsideRPC(method, {}, (err, data) => {
         if (!err) handleAddressResponse(method, data);
     });
 }
