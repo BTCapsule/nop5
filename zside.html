@@ -387,7 +387,7 @@ list-style: none;
        
       
       <div id="button-container2" class="exclude">
-        <button class="exclude" onclick="zsideRPC('get_new_address'); setTimeout(function() {document.getElementById('qrcode-wrapper').style.display = 'inline-block';}, 500)"> RECEIVE</button>
+        <button class="exclude" onclick="zsideRPC('get_new_transparent_address'); setTimeout(function() {document.getElementById('qrcode-wrapper').style.display = 'inline-block';}, 500)"> RECEIVE</button>
         <button style="width:155px;" id="sendButton" class="exclude">SEND</button> 
       </div>
       <br>
@@ -570,7 +570,7 @@ async function showDeposit() {
     try {
 
         // -------- GET RAW ADDRESS --------
-        const newAddrData = await zsideRPC('get_new_address');
+        const newAddrData = await zsideRPC('get_new_transparent_address');
         const rawAddress = newAddrData?.result;
 
         if (!rawAddress || typeof rawAddress !== 'string') {
@@ -1140,7 +1140,7 @@ if (
     console.log(`Balance parsed: ${sats} sats → ${btc} BTC`);
 }
 
-if (method === 'get_new_address') {
+if (method === 'get_new_transparent_address') {
     const address = data?.result;
     if (address && typeof address === 'string') {
         if (autoShowQRCode) {
