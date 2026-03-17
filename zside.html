@@ -1304,44 +1304,51 @@ function showAddressQRCode(transparentAddress, shieldedAddress) {
     wrapper.style.flexDirection = 'row';
     wrapper.style.justifyContent = 'space-around';
     wrapper.style.alignItems = 'center';
-    wrapper.style.width = '512px';
-    wrapper.style.height = '256px';
+    wrapper.style.width = '100%';
     wrapper.style.visibility = 'visible';
-    wrapper.style.marginTop = '-250px';
+    wrapper.style.marginTop = '20px';
 
-    // Clear any existing content
+    // Clear previous QR codes
     wrapper.innerHTML = '';
 
-    // Function to create a QR code canvas
+    // Helper to create QR code
     function createQR(address) {
         const qrDiv = document.createElement('div');
-        new QRCode(qrDiv, {
-            text: `bitcoin:${address}`,
+        qrDiv.style.display = 'flex';
+        qrDiv.style.flexDirection = 'column';
+        qrDiv.style.alignItems = 'center';
+        qrDiv.style.margin = '10px';
+
+        const label = document.createElement('div');
+        label.innerHTML = `<strong>${address.type}:</strong><br>${address.value}`;
+        label.style.color = 'white';
+        label.style.marginBottom = '10px';
+        label.style.textAlign = 'center';
+
+        qrDiv.appendChild(label);
+
+        const qrCodeContainer = document.createElement('div');
+        new QRCode(qrCodeContainer, {
+            text: `bitcoin:${address.value}`,
             width: 256,
             height: 256,
             colorDark: "#000000",
             colorLight: "#ffffff",
             correctLevel: QRCode.CorrectLevel.H
         });
+
+        qrDiv.appendChild(qrCodeContainer);
         return qrDiv;
     }
 
-    // Transparent address
+    // Add transparent address QR
     if (transparentAddress) {
-        const tContainer = document.createElement('div');
-        tContainer.style.textAlign = 'center';
-        tContainer.innerHTML = `<strong>Transparent:</strong><br>${transparentAddress}`;
-        tContainer.appendChild(createQR(transparentAddress));
-        wrapper.appendChild(tContainer);
+        wrapper.appendChild(createQR({ type: 'Transparent', value: transparentAddress }));
     }
 
-    // Shielded address
+    // Add shielded address QR
     if (shieldedAddress) {
-        const sContainer = document.createElement('div');
-        sContainer.style.textAlign = 'center';
-        sContainer.innerHTML = `<strong>Shielded:</strong><br>${shieldedAddress}`;
-        sContainer.appendChild(createQR(shieldedAddress));
-        wrapper.appendChild(sContainer);
+        wrapper.appendChild(createQR({ type: 'Shielded', value: shieldedAddress }));
     }
 }
 
