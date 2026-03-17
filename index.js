@@ -33,6 +33,8 @@ const pipelineAsync = promisify(pipeline);
 const BIN_DIR = path.join(__dirname, 'bin');
 if (!fs.existsSync(BIN_DIR)) fs.mkdirSync(BIN_DIR);
 
+
+
 let GRPCURL_BIN;
 
 function detectGrpcurlPath() {
@@ -64,6 +66,36 @@ function detectGrpcurlPath() {
     throw new Error(`Unsupported platform: ${platform}`);
   }
 }
+
+function ensureGrpcurlExecutable() {
+  const grpcPath = detectGrpcurlPath();
+
+  if (!fs.existsSync(grpcPath)) {
+    throw new Error(`grpcurl not found at ${grpcPath}`);
+  }
+
+  // Only needed for Unix systems
+  if (os.platform() !== 'win32') {
+    try {
+      const stats = fs.statSync(grpcPath);
+
+      // Check if executable bit is missing
+      const isExecutable = (stats.mode & 0o111) !== 0;
+
+      if (!isExecutable) {
+        console.log('Fixing grpcurl permissions...');
+        fs.chmodSync(grpcPath, 0o755);
+      }
+    } catch (err) {
+      throw new Error(`Failed to set permissions on grpcurl: ${err.message}`);
+    }
+  }
+
+  return grpcPath;
+}
+
+// Initialize once at startup
+GRPCURL_BIN = ensureGrpcurlExecutable();
 
 async function ensureGrpcurl() {
   GRPCURL_BIN = detectGrpcurlPath();
