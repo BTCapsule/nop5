@@ -1177,7 +1177,49 @@ if (method === 'get_new_transparent_address') {
     const address = data?.result;
     if (address && typeof address === 'string') {
         if (autoShowQRCode) {
-            showAddressQRCode(address); // only auto-show QR code if allowed
+            showAddressQRCode(address);
+            // After displaying the transparent address:
+const depositUI = document.getElementById("result");
+
+// Add shield button
+let shieldBtn = document.createElement("button");
+shieldBtn.innerText = "Shield Address";
+shieldBtn.style.fontSize = "36px";
+shieldBtn.style.padding = "15px 30px";
+shieldBtn.style.marginTop = "30px";
+
+depositUI.appendChild(shieldBtn);
+
+shieldBtn.addEventListener("click", async () => {
+    try {
+        const shieldData = await zsideRPC("get_new_shielded_address");
+        const shieldAddr = shieldData?.result;
+
+        if (!shieldAddr) {
+            alert("Failed to get shielded address");
+            return;
+        }
+
+        // Update address display
+        document.getElementById("depositAddress").innerText = shieldAddr;
+
+        // Update QR code
+        const qrContainer = document.getElementById("qrcode");
+        qrContainer.innerHTML = '';
+        new QRCode(qrContainer, {
+            text: `bitcoin:${shieldAddr}`,
+            width: 512,
+            height: 512,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+        });
+
+    } catch (err) {
+        console.error(err);
+        alert("Error generating shielded address");
+    }
+});
         }
     } else {
         console.error("Invalid or missing address in response:", data);
