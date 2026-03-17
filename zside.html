@@ -112,9 +112,9 @@ position: absolute;
     text-align: center;
     margin-top: 600px;
 
-   /* display: flex;*/
-    flex-direction: column;   /* 🔥 KEY */
-    align-items: center;      /* center horizontally */
+    display: flex;
+    flex-direction: column; 
+    align-items: center;    
 
     width: 600px;
     margin-left: auto;
@@ -483,7 +483,7 @@ function showInfo(info) {
     resultDiv.innerHTML = '';
 
     // Hide other UI elements
-    hide([
+    hide(['center-results',
         'mnemonicContainer', 'create_wallet', 'walletName', 'confirmWalletCreation',
         'btcAddress', 'feerate', 'scanButton', 'btc', 'amount', 'confirm',
         'qrcode-wrapper', 'qrcode', 'address'
@@ -568,7 +568,7 @@ async function showDeposit() {
     resultDiv.innerHTML = '';
 
     // Hide everything unrelated
-    hide([
+    hide(['center-results',
         'mnemonicContainer','create_wallet','walletName','confirmWalletCreation',
         'btcAddress','feerate','scanButton','confirm',
         'qrcode-wrapper','qrcode','address', 'amount', 'btc'
@@ -759,7 +759,7 @@ document.getElementById("scanButton").addEventListener("click", async () => {
     const reader = document.getElementById("reader");
 
     // Hide form elements so camera takes over
-    hide(['btcAddress', 'amount', 'scanButton', 'btc', 'confirm']);
+    hide(['center-results','btcAddress', 'amount', 'scanButton', 'btc', 'confirm']);
 
     reader.style.display = "block";
 reader.style.visibility = "visible";
@@ -825,7 +825,7 @@ function handleScannedText(text) {
 
 document.getElementById("sendButton").addEventListener("click", () => {
 
-hide(['mnemonicContainer', 'create_wallet', 'walletName', 'confirmWalletCreation', 'result', 'feerate', 'qrcode', 'address', 'qrcode-wrapper']);
+hide(['center-results','mnemonicContainer', 'create_wallet', 'walletName', 'confirmWalletCreation', 'result', 'feerate', 'qrcode', 'address', 'qrcode-wrapper']);
 
 const amt = document.getElementById("amount");
 amt.style.display = "none";
@@ -1390,7 +1390,7 @@ async function showSidechains() {
     let resultDiv = document.getElementById("result");
 
     // Hide other UI elements
-    hide([
+    hide(['center-results',
         'mnemonicContainer','create_wallet','walletName','confirmWalletCreation',
         'btcAddress','feerate','scanButton','btc','amount','confirm',
         'qrcode-wrapper','qrcode','address','reader'
