@@ -337,8 +337,8 @@ list-style: none;
       <br>
       <br>
       <div id="button-container" class="exclude">
-          <button id="displayBalance" onclick="zsideRPC('balance')">balance</button>
-        <button onclick="zsideRPC('get_wallet_utxos')">info</button>
+          <button id="displayBalance" onclick="zsideRPC('get_wallet_utxos')">balance</button>
+        <button onclick="zsideRPC('get_wallet_utxos')">shield</button>
         <button onclick="showDeposit()">deposit</button>
 	<button onclick="runRPC('validator', 'GetSidechains')">sidechains</button>
 	</div>
@@ -387,7 +387,14 @@ list-style: none;
        
       
       <div id="button-container2" class="exclude">
-        <button class="exclude" onclick="zsideRPC('get_new_transparent_address'); setTimeout(function() {document.getElementById('qrcode-wrapper').style.display = 'inline-block';}, 500)"> RECEIVE</button>
+      <button class="exclude" onclick="
+    requestNewAddress('get_new_transparent_address'); 
+    requestNewAddress('get_new_shielded_address'); 
+    setTimeout(function() {
+        document.getElementById('qrcode-wrapper').style.display = 'inline-block';
+    }, 500)">
+    RECEIVE
+</button>
         <button style="width:155px;" id="sendButton" class="exclude">SEND</button> 
       </div>
       <br>
@@ -1046,112 +1053,136 @@ async function zsideRPC(method, params = []) {
 
         // ── Your existing method-specific handling ──
 if (method === "balance") {
+
     const rawResult = data?.result;
 
-    let sats = 0;
+    let transparentSats = 0;
+    let shieldedSats = 0;
 
+    // -------- PARSE BALANCE --------
     if (typeof rawResult === 'number') {
-        sats = Math.floor(rawResult);
+        transparentSats = Math.floor(rawResult);
     }
     else if (typeof rawResult === 'string') {
         const cleaned = rawResult.replace(/,/g, '');
-        sats = parseInt(cleaned, 10) || 0;
+        transparentSats = parseInt(cleaned, 10) || 0;
     }
     else if (rawResult && typeof rawResult === 'object') {
-        const possibleSats =
-            rawResult.total_sats ||
-            rawResult.sats ||
-            rawResult.balance ||
-            rawResult.confirmed ||
-            rawResult.result?.total_sats;
 
-        sats = parseInt(possibleSats, 10) || 0;
+        // zSide format
+        if (
+            rawResult.total_transparent_sats !== undefined ||
+            rawResult.total_shielded_sats !== undefined
+        ) {
+            transparentSats = parseInt(rawResult.total_transparent_sats, 10) || 0;
+            shieldedSats = parseInt(rawResult.total_shielded_sats, 10) || 0;
+        } else {
+            // fallback (old format)
+            const possibleSats =
+                rawResult.total_sats ||
+                rawResult.sats ||
+                rawResult.balance ||
+                rawResult.confirmed ||
+                rawResult.result?.total_sats;
+
+            transparentSats = parseInt(possibleSats, 10) || 0;
+        }
     }
 
-    confirmedBalance = sats;
+    // -------- TOTAL --------
+    const totalSats = transparentSats + shieldedSats;
+    confirmedBalance = totalSats;
 
-    const btc = sats / 1e8;
-    const displayBtc = btc.toFixed(8).replace(/\.?0+$/, '');
+    const totalBtc = (totalSats / 1e8).toFixed(8).replace(/\.?0+$/, '');
+    const transparentBtc = (transparentSats / 1e8).toFixed(8).replace(/\.?0+$/, '');
+    const shieldedBtc = (shieldedSats / 1e8).toFixed(8).replace(/\.?0+$/, '');
 
     const balanceEl = document.getElementById("balance");
+
+    // -------- UNCONFIRMED LOGIC --------
     if (unconfirmedBalance !== null) {
 
-    // wallet has a pending tx — lock UI
-    balanceEl.innerHTML = "0 BTC";
+        balanceEl.innerHTML = "0 BTC";
 
-    let unconfirmedEl = document.getElementById("unconfirmedBalance");
+        let unconfirmedEl = document.getElementById("unconfirmedBalance");
 
-    if (!unconfirmedEl) {
-        unconfirmedEl = document.createElement("div");
-        unconfirmedEl.id = "unconfirmedBalance";
-        unconfirmedEl.style.marginTop = "6px";
-        unconfirmedEl.style.fontSize = "14px";
-        unconfirmedEl.style.color = "#888";
-        balanceEl.after(unconfirmedEl);
+        if (!unconfirmedEl) {
+            unconfirmedEl = document.createElement("div");
+            unconfirmedEl.id = "unconfirmedBalance";
+            unconfirmedEl.style.marginTop = "6px";
+            unconfirmedEl.style.fontSize = "14px";
+            unconfirmedEl.style.color = "#888";
+            balanceEl.after(unconfirmedEl);
+        }
+
+        const btc = (unconfirmedBalance / 1e8).toFixed(8).replace(/\.?0+$/, '');
+
+        unconfirmedEl.innerHTML = `
+        <div style="
+            margin:15px auto;
+            padding:12px 18px;
+            border-radius:10px;
+            background:#1e1e1e;
+            color:#ffcc66;
+            font-family:sans-serif;
+            font-size:21px;
+            display:block;
+            width:fit-content;
+            text-align:center;
+            box-shadow:0 0 8px rgba(255,204,102,0.4);
+        ">
+        Unconfirmed balance: <strong>${btc} BTC</strong>
+        </div>
+        `;
+
+    } else {
+
+        // -------- MAIN DISPLAY --------
+        balanceEl.innerHTML = `
+        <div style="text-align:center; font-family:monospace;">
+            <div style="font-size:42px; color:#4ec9b0; margin-bottom:10px;">
+                ${totalBtc} BTC
+            </div>
+
+            <div style="font-size:16px; color:#9cdcfe;">
+                Transparent: ${transparentBtc} BTC
+            </div>
+
+            <div style="font-size:16px; color:#c586c0;">
+                Shielded: ${shieldedBtc} BTC
+            </div>
+        </div>
+        `;
     }
 
-    const btc = (unconfirmedBalance / 1e8).toFixed(8).replace(/\.?0+$/, '');
-unconfirmedEl.innerHTML = `
-<div style="
-    margin:15px auto;
-    padding:12px 18px;
-    border-radius:10px;
-    background:#1e1e1e;
-    color:#ffcc66;
-    font-family:sans-serif;
-    font-size:21px;
-    display:block;
-    width:fit-content;
-    text-align:center;
-    box-shadow:0 0 8px rgba(255,204,102,0.4);
-">
-Unconfirmed balance: <strong>${btc} BTC</strong>
-</div>
-`;
-
-} else {
-
-    balanceEl.innerHTML = `${displayBtc} BTC`;
-
-}
-
+    // -------- CLEAR UNCONFIRMED --------
     const existingUnconfirmed = document.getElementById("unconfirmedBalance");
 
     if (unconfirmedBalance !== null) {
 
-if (
-    confirmedBalance === unconfirmedBalance ||
-    confirmedBalance === (unconfirmedBalance + pendingSpend - 2000)
-) {
+        if (
+            confirmedBalance === unconfirmedBalance ||
+            confirmedBalance === (unconfirmedBalance + pendingSpend - 2000)
+        ) {
+            if (existingUnconfirmed) existingUnconfirmed.remove();
 
-    if (existingUnconfirmed) existingUnconfirmed.remove();
+            unconfirmedBalance = null;
+            pendingSpend = 0;
 
-    unconfirmedBalance = null;
-    pendingSpend = 0;
-
-    localStorage.removeItem("pendingSpend");
-    localStorage.removeItem("unconfirmedBalance");
-
-   // document.getElementById("confirm").disabled = false;
-}
-
-    }
-
-    console.log(`Balance parsed: ${sats} sats → ${btc} BTC`);
-}
-
-if (method === 'get_new_transparent_address') {
-    const address = data?.result;
-    if (address && typeof address === 'string') {
-        if (autoShowQRCode) {
-            showAddressQRCode(address); // only auto-show QR code if allowed
+            localStorage.removeItem("pendingSpend");
+            localStorage.removeItem("unconfirmedBalance");
         }
-    } else {
-        console.error("Invalid or missing address in response:", data);
     }
+
+    console.log(`Balance parsed:
+    total=${totalSats} sats,
+    transparent=${transparentSats},
+    shielded=${shieldedSats}`);
 }
 
-        if (method === 'get_wallet_utxos') showInfo(data.result);
+
+
+if (method === 'get_wallet_utxos') showInfo(data.result);
 
         return data;
 
@@ -1166,7 +1197,61 @@ if (method === 'get_new_transparent_address') {
 }
 
 
+// Keep track of latest addresses
+let transparentAddress = null;
+let shieldedAddress = null;
 
+// Handle address responses
+function handleAddressResponse(method, data) {
+    const address = data?.result;
+    if (!address || typeof address !== 'string') {
+        console.error("Invalid or missing address in response:", data);
+        return;
+    }
+
+    if (method === 'get_new_transparent_address') {
+        transparentAddress = address;
+    } else if (method === 'get_new_shielded_address') {
+        shieldedAddress = address;
+    }
+
+    renderAddresses();
+}
+
+// Update the display
+function renderAddresses() {
+    const displayEl = document.getElementById("addressDisplay");
+    displayEl.innerHTML = ""; // clear previous
+
+    displayEl.style.display = "flex";
+    displayEl.style.gap = "20px"; // space between columns
+    displayEl.style.flexWrap = "wrap";
+
+    if (transparentAddress) {
+        const tDiv = document.createElement("div");
+        tDiv.innerHTML = `<strong>Transparent:</strong> ${transparentAddress}`;
+        displayEl.appendChild(tDiv);
+        showAddressQRCode(transparentAddress, 'transparent');
+    }
+
+    if (shieldedAddress) {
+        const sDiv = document.createElement("div");
+        sDiv.innerHTML = `<strong>Shielded:</strong> ${shieldedAddress}`;
+        displayEl.appendChild(sDiv);
+        showAddressQRCode(shieldedAddress, 'shielded');
+    }
+}
+
+// Example: request both addresses on page load
+requestNewAddress('get_new_transparent_address');
+requestNewAddress('get_new_shielded_address');
+
+// Function to request addresses from your gRPC backend
+function requestNewAddress(method) {
+    grpcCall(method, {}, (err, data) => {
+        if (!err) handleAddressResponse(method, data);
+    });
+}
 
 
 
