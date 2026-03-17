@@ -105,23 +105,22 @@ position: absolute;
         background-color: white;
         display: none;
       }
-#address {
-    color: white;
-    font-size: 36px;
-    font-family: sans-serif;
-    text-align: center;
-    margin-top: 600px;
 
-    display: flex;
-    flex-direction: column;   /* 🔥 KEY */
-    align-items: center;      /* center horizontally */
-
-    width: 600px;
-    margin-left: auto;
-    margin-right: auto;
-
-    word-wrap: break-word;
-}
+      #address {
+        color: white;
+        font-size: 36px;
+        font-family: sans-serif;
+        text-align: center;
+        margin-top: 200px;
+        margin-right: auto;
+position: absolute;
+        margin-left: auto;
+        justify-content: center;
+        bottom: 500px;
+        width: 600px;
+        display: flex;
+        word-wrap: break-word;
+      }
 
       #transactions {
         font-family: sans-serif;
@@ -1233,7 +1232,7 @@ async function handleReceive() {
     shieldBtn.innerText = "Shield";
     shieldBtn.style.fontSize = "36px";
     shieldBtn.style.padding = "15px 30px";
-    shieldBtn.style.marginTop = "200px";
+   // shieldBtn.style.marginTop = "150px";
   //  shieldBtn.style.display = "block";
   //  shieldBtn.style.marginBottom = "-100px";
     shieldBtn.style.backgroundColor = "#ffffff";
