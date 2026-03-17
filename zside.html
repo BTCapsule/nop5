@@ -1214,7 +1214,7 @@ if (method === 'get_wallet_utxos') showInfo(data.result);
 
 async function handleReceive() {
     const resultDiv = document.getElementById("shieldBtn");
-    resultDiv.innerHTML = ''; // clear old content
+   // resultDiv.innerHTML = ''; // clear old content
 
     // Get a new transparent address
     const addrData = await zsideRPC('get_new_transparent_address');
