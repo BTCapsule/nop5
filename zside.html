@@ -1204,7 +1204,7 @@ if (method === 'get_wallet_utxos') showInfo(data.result);
 
 
 async function handleReceive() {
-    const resultDiv = document.getElementById("result");
+    const resultDiv = document.getElementById("qr-wrapper");
     resultDiv.innerHTML = ''; // clear old content
 
     // Get a new transparent address
@@ -1231,7 +1231,7 @@ async function handleReceive() {
     shieldBtn.style.borderRadius = "8px";
     shieldBtn.style.zIndex = "99";
     
-    resultDiv.appendChild("qrcode-wrapper");
+    resultDiv.appendChild(shieldBtn);
 
     shieldBtn.addEventListener("click", async () => {
         try {
