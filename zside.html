@@ -387,7 +387,7 @@ list-style: none;
        
       
       <div id="button-container2" class="exclude">
-        <button class="exclude" onclick="zsideRPC('get_new_transparent_address'); setTimeout(function() {document.getElementById('qrcode-wrapper').style.display = 'inline-block';}, 500)"> RECEIVE</button>
+        <button class="exclude" onclick="handleReceive()">RECEIVE</button>
         <button style="width:155px;" id="sendButton" class="exclude">SEND</button> 
       </div>
       <br>
@@ -1178,52 +1178,7 @@ if (method === 'get_new_transparent_address') {
     if (address && typeof address === 'string') {
         if (autoShowQRCode) {
             showAddressQRCode(address);
-            // After displaying the transparent address:
-const depositUI = document.getElementById("result");
-
-// Add shield button
-let shieldBtn = document.createElement("button");
-shieldBtn.innerText = "Shield Address";
-shieldBtn.style.fontSize = "36px";
-shieldBtn.style.padding = "15px 30px";
-shieldBtn.style.marginTop = "30px";
-shieldBtn.style.backgroundColor = "#ffffff"; // white background
-shieldBtn.style.color = "#000000"; // black text
-shieldBtn.style.border = "2px solid #4ec9b0"; // optional border to make it stand out
-shieldBtn.style.borderRadius = "8px"; // rounded corners
-
-depositUI.appendChild(shieldBtn);
-
-shieldBtn.addEventListener("click", async () => {
-    try {
-        const shieldData = await zsideRPC("get_new_shielded_address");
-        const shieldAddr = shieldData?.result;
-
-        if (!shieldAddr) {
-            alert("Failed to get shielded address");
-            return;
-        }
-
-        // Update address display
-        document.getElementById("depositAddress").innerText = shieldAddr;
-
-        // Update QR code
-        const qrContainer = document.getElementById("qrcode");
-        qrContainer.innerHTML = '';
-        new QRCode(qrContainer, {
-            text: `bitcoin:${shieldAddr}`,
-            width: 512,
-            height: 512,
-            colorDark: "#000000",
-            colorLight: "#ffffff",
-            correctLevel: QRCode.CorrectLevel.H
-        });
-
-    } catch (err) {
-        console.error(err);
-        alert("Error generating shielded address");
-    }
-});
+            
         }
     } else {
         console.error("Invalid or missing address in response:", data);
@@ -1246,7 +1201,63 @@ if (method === 'get_wallet_utxos') showInfo(data.result);
 }
 
 
+async function handleReceive() {
+    const resultDiv = document.getElementById("result");
+    resultDiv.innerHTML = ''; // clear old content
 
+    // Get a new transparent address
+    const addrData = await zsideRPC('get_new_transparent_address');
+    const address = addrData?.result;
+
+    if (!address) {
+        alert("Failed to get new address");
+        return;
+    }
+
+    // Show address and QR code
+    showAddressQRCode(address);
+
+    // Add Shield button below it
+    let shieldBtn = document.createElement("button");
+    shieldBtn.innerText = "Shield Address";
+    shieldBtn.style.fontSize = "36px";
+    shieldBtn.style.padding = "15px 30px";
+    shieldBtn.style.marginTop = "30px";
+    shieldBtn.style.backgroundColor = "#ffffff";
+    shieldBtn.style.color = "#000000";
+    shieldBtn.style.border = "2px solid #4ec9b0";
+    shieldBtn.style.borderRadius = "8px";
+
+    resultDiv.appendChild(shieldBtn);
+
+    shieldBtn.addEventListener("click", async () => {
+        try {
+            const shieldData = await zsideRPC("get_new_shielded_address");
+            const shieldAddr = shieldData?.result;
+            if (!shieldAddr) {
+                alert("Failed to get shielded address");
+                return;
+            }
+
+            document.getElementById("depositAddress").innerText = shieldAddr;
+
+            const qrContainer = document.getElementById("qrcode");
+            qrContainer.innerHTML = '';
+            new QRCode(qrContainer, {
+                text: `bitcoin:${shieldAddr}`,
+                width: 512,
+                height: 512,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+
+        } catch (err) {
+            console.error(err);
+            alert("Error generating shielded address");
+        }
+    });
+}
 
 
 
