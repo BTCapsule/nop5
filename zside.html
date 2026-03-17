@@ -391,6 +391,7 @@ list-style: none;
 ">
     <div id="result"></div>
     <div id="address"></div>
+    <div id="shieldBtn"></div>
 </div>
        
       
@@ -1212,7 +1213,7 @@ if (method === 'get_wallet_utxos') showInfo(data.result);
 
 
 async function handleReceive() {
-    const resultDiv = document.getElementById("address");
+    const resultDiv = document.getElementById("shieldBtn");
     resultDiv.innerHTML = ''; // clear old content
 
     // Get a new transparent address
