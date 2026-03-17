@@ -1224,12 +1224,13 @@ async function handleReceive() {
     shieldBtn.innerText = "Shield Address";
     shieldBtn.style.fontSize = "36px";
     shieldBtn.style.padding = "15px 30px";
-    shieldBtn.style.marginTop = "30px";
+    shieldBtn.style.marginTop = "-430px";
     shieldBtn.style.backgroundColor = "#ffffff";
     shieldBtn.style.color = "#000000";
     shieldBtn.style.border = "2px solid #4ec9b0";
     shieldBtn.style.borderRadius = "8px";
-
+    shieldBtn.style.zIndex = "99";
+    
     resultDiv.appendChild(shieldBtn);
 
     shieldBtn.addEventListener("click", async () => {
