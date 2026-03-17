@@ -1204,7 +1204,7 @@ if (method === 'get_wallet_utxos') showInfo(data.result);
 
 
 async function handleReceive() {
-    const resultDiv = document.getElementById("qrcode-wrapper");
+    const resultDiv = document.getElementById("address");
     resultDiv.innerHTML = ''; // clear old content
 
     // Get a new transparent address
