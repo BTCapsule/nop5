@@ -93,16 +93,17 @@ list-style: none
 
       #qrcode {
         text-align: center;
-      
+        height: 0;
+position: absolute;
       }
 
       #qrcode-wrapper {
-
+position: absolute;
         margin-top: 610px;
         margin-right: 10px;
         
         background-color: white;
-       
+        display: none;
       }
 
       #address {
@@ -386,14 +387,7 @@ list-style: none;
        
       
       <div id="button-container2" class="exclude">
-      <button class="exclude" onclick="
-    requestNewAddress('get_new_transparent_address'); 
-    requestNewAddress('get_new_shielded_address'); 
-    setTimeout(function() {
-        document.getElementById('qrcode-wrapper').style.display = 'inline-block';
-    }, 500)">
-    RECEIVE
-</button>
+        <button class="exclude" onclick="zsideRPC('get_new_transparent_address'); setTimeout(function() {document.getElementById('qrcode-wrapper').style.display = 'inline-block';}, 500)"> RECEIVE</button>
         <button style="width:155px;" id="sendButton" class="exclude">SEND</button> 
       </div>
       <br>
@@ -1179,6 +1173,16 @@ if (method === "balance") {
     shielded=${shieldedSats}`);
 }
 
+if (method === 'get_new_transparent_address') {
+    const address = data?.result;
+    if (address && typeof address === 'string') {
+        if (autoShowQRCode) {
+            showAddressQRCode(address); // only auto-show QR code if allowed
+        }
+    } else {
+        console.error("Invalid or missing address in response:", data);
+    }
+}
 
 
 if (method === 'get_wallet_utxos') showInfo(data.result);
@@ -1196,61 +1200,7 @@ if (method === 'get_wallet_utxos') showInfo(data.result);
 }
 
 
-// Keep track of latest addresses
-let transparentAddress = null;
-let shieldedAddress = null;
 
-// Handle address responses
-function handleAddressResponse(method, data) {
-    const address = data?.result;
-    if (!address || typeof address !== 'string') {
-        console.error("Invalid or missing address in response:", data);
-        return;
-    }
-
-    if (method === 'get_new_transparent_address') {
-        transparentAddress = address;
-    } else if (method === 'get_new_shielded_address') {
-        shieldedAddress = address;
-    }
-
-    renderAddresses();
-}
-
-// Update the display
-function renderAddresses() {
-    const displayEl = document.getElementById("addressDisplay");
-    displayEl.innerHTML = ""; // clear previous
-
-    displayEl.style.display = "flex";
-    displayEl.style.gap = "20px"; // space between columns
-    displayEl.style.flexWrap = "wrap";
-
-    if (transparentAddress) {
-        const tDiv = document.createElement("div");
-        tDiv.innerHTML = `<strong>Transparent:</strong> ${transparentAddress}`;
-        displayEl.appendChild(tDiv);
-        showAddressQRCode(transparentAddress, 'transparent');
-    }
-
-    if (shieldedAddress) {
-        const sDiv = document.createElement("div");
-        sDiv.innerHTML = `<strong>Shielded:</strong> ${shieldedAddress}`;
-        displayEl.appendChild(sDiv);
-        showAddressQRCode(shieldedAddress, 'shielded');
-    }
-}
-
-// Example: request both addresses on page load
-requestNewAddress('get_new_transparent_address');
-requestNewAddress('get_new_shielded_address');
-
-// Function to request addresses from your gRPC backend
-function requestNewAddress(method) {
-    zsideRPC(method, {}, (err, data) => {
-        if (!err) handleAddressResponse(method, data);
-    });
-}
 
 
 
@@ -1282,73 +1232,36 @@ function showTransactions(transactions) {
 
 }
 
-function showAddressQRCode(transparentAddress, shieldedAddress) {
-    hide([
-        'mnemonicContainer',
-        'create_wallet',
-        'walletName',
-        'confirmWalletCreation',
-        'result',
-        'feerate',
-        'btcAddress',
-        'scanButton',
-        'btc',
-        'amount',
-        'confirm',
-        'reader'
-    ]);
+function showAddressQRCode(address) {
+    hide(['mnemonicContainer', 'create_wallet', 'walletName', 'confirmWalletCreation', 'result', 'feerate', 'btcAddress', 'scanButton', 'btc', 'amount', 'confirm', 'reader']);
+    //showDivs(['qrcode', 'address', 'qrcode-wrapper']);
+
+
 
     const wrapper = document.getElementById('qrcode-wrapper');
-    wrapper.style.display = 'flex';
-    wrapper.style.flexDirection = 'row';
-    wrapper.style.justifyContent = 'space-around';
-    wrapper.style.alignItems = 'center';
-    wrapper.style.width = '100%';
-    wrapper.style.visibility = 'visible';
-    wrapper.style.marginTop = '20px';
+wrapper.style.display = 'block';
 
-    // Clear previous QR codes
-    wrapper.innerHTML = '';
+    wrapper.style.width = wrapper.style.height = '512px';
+   const addr = document.getElementById("address")
+   const qr = document.getElementById("qrcode")
 
-    // Helper to create QR code
-    function createQR(address) {
-        const qrDiv = document.createElement('div');
-        qrDiv.style.display = 'flex';
-        qrDiv.style.flexDirection = 'column';
-        qrDiv.style.alignItems = 'center';
-        qrDiv.style.margin = '10px';
+wrapper.style.visibility = 'visible';
+addr.innerHTML = address;
+qr.innerHTML = '';
+addr.style.visibility = 'visible';
+qr.style.visibility = 'visible';
+wrapper.style.marginTop = '-250px';
+//qr.style.marginTop = '-950px';
 
-        const label = document.createElement('div');
-        label.innerHTML = `<strong>${address.type}:</strong><br>${address.value}`;
-        label.style.color = 'white';
-        label.style.marginBottom = '10px';
-        label.style.textAlign = 'center';
-
-        qrDiv.appendChild(label);
-
-        const qrCodeContainer = document.createElement('div');
-        new QRCode(qrCodeContainer, {
-            text: `bitcoin:${address.value}`,
-            width: 256,
-            height: 256,
-            colorDark: "#000000",
-            colorLight: "#ffffff",
-            correctLevel: QRCode.CorrectLevel.H
-        });
-
-        qrDiv.appendChild(qrCodeContainer);
-        return qrDiv;
-    }
-
-    // Add transparent address QR
-    if (transparentAddress) {
-        wrapper.appendChild(createQR({ type: 'Transparent', value: transparentAddress }));
-    }
-
-    // Add shielded address QR
-    if (shieldedAddress) {
-        wrapper.appendChild(createQR({ type: 'Shielded', value: shieldedAddress }));
-    }
+//addr.style.marginTop = '-550px';
+    new QRCode(document.getElementById("qrcode"), {
+        text: `bitcoin:${address}`,
+        width: 512,
+        height: 512,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
+    })
 }
 
 
