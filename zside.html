@@ -1241,7 +1241,7 @@ async function handleReceive() {
                 return;
             }
 
-            document.getElementById("depositAddress").innerText = shieldAddr;
+            document.getElementById("address").innerText = shieldAddr;
 
             const qrContainer = document.getElementById("qrcode");
             qrContainer.innerHTML = '';
@@ -1292,7 +1292,7 @@ function showTransactions(transactions) {
 }
 
 function showAddressQRCode(address) {
-    hide(['mnemonicContainer', 'create_wallet', 'walletName', 'confirmWalletCreation', 'result', 'feerate', 'btcAddress', 'scanButton', 'btc', 'amount', 'confirm', 'reader']);
+    hide(['mnemonicContainer', 'create_wallet', 'walletName', 'confirmWalletCreation', 'feerate', 'btcAddress', 'scanButton', 'btc', 'amount', 'confirm', 'reader']);
     //showDivs(['qrcode', 'address', 'qrcode-wrapper']);
 
 
