@@ -456,7 +456,7 @@ function showDivs(divIds) {
     for (let id of divIds) {
         let elem = document.getElementById(id);
         if (elem) {
-            elem.style.visibility = 'visible';
+            elem.style.display = 'flex';
             elem.style.height = "auto";   // ← restore height
         }
     }
@@ -504,7 +504,7 @@ function showInfo(info) {
     if (!info || !Array.isArray(info) || info.length === 0) {
         container.innerHTML = '<p style="color:#ff6b6b;">No transactions found.</p>';
         resultDiv.appendChild(container);
-        resultDiv.style.visibility = 'visible';
+        resultDiv.style.display = 'flex';
         resultDiv.style.marginTop = '-1250px';
         return;
     }
@@ -553,7 +553,7 @@ function showInfo(info) {
 
     resultDiv.appendChild(container);
 
-    resultDiv.style.visibility = 'visible';
+    resultDiv.style.display = 'flex';
     resultDiv.style.marginTop = '-1250px';
     resultDiv.style.fontSize = '16px';
 }
@@ -584,7 +584,7 @@ async function showDeposit() {
 
         if (!rawAddress || typeof rawAddress !== 'string') {
             resultDiv.innerHTML = `<p style="color:#ff6b6b; font-size:18px;">Failed to get deposit address</p>`;
-            resultDiv.style.visibility = 'visible';
+            resultDiv.style.display = 'flex';
             return;
         }
 
@@ -714,7 +714,7 @@ async function showDeposit() {
 
         });
 
-        resultDiv.style.visibility = 'visible';
+        resultDiv.style.display = 'flex';
         resultDiv.style.marginTop = '-1250px';
 
     } catch(err) {
@@ -722,7 +722,7 @@ async function showDeposit() {
         console.error("showDeposit error:", err);
 
         resultDiv.innerHTML = `<p style="color:#ff6b6b; font-size:18px;">Error fetching deposit address</p>`;
-        resultDiv.style.visibility = 'visible';
+        resultDiv.style.display = 'flex';
 
     } finally {
 
@@ -740,7 +740,7 @@ async function showDeposit() {
 function hide(elementIds) {
     for (let id of elementIds) {
         let elem = document.getElementById(id);
-        if (elem) elem.style.visibility = 'hidden';
+        if (elem) elem.style.display = 'none';
     }
 }
 
@@ -761,8 +761,8 @@ document.getElementById("scanButton").addEventListener("click", async () => {
     // Hide form elements so camera takes over
     hide(['center-results','btcAddress', 'amount', 'scanButton', 'btc', 'confirm']);
 
-    reader.style.display = "block";
-reader.style.visibility = "visible";
+    reader.style.display = "flex";
+//reader.style.visibility = "visible";
 
     if (!scanner) {
         scanner = new Html5Qrcode("reader");
@@ -841,11 +841,11 @@ amt.style.display = "inline-block";
     // restore hidden elements
 
 document.getElementById("btcForm").style.display = "block";
-    document.getElementById("btcAddress").style.visibility = "visible";
-    document.getElementById("amount").style.visibility = "visible";
-    document.getElementById("scanButton").style.visibility = "visible";
-    document.getElementById("btc").style.visibility = "visible";
-    document.getElementById("confirm").style.visibility = "visible";
+    document.getElementById("btcAddress").style.display = 'flex';
+    document.getElementById("amount").style.display = 'flex';
+    document.getElementById("scanButton").style.display = 'flex';
+    document.getElementById("btc").style.display = 'flex';
+    document.getElementById("confirm").style.display = 'flex';
 
 });
 
@@ -864,7 +864,7 @@ document.getElementById("confirm").addEventListener("click", async (e) => {
     const confirmBtn = document.getElementById("confirm");
     const balanceEl = document.getElementById("balance");
 
-    resultDiv.style.visibility = "visible";
+    resultDiv.style.display = 'flex';
     resultDiv.innerHTML = "";
 
     // Prevent sending if balance already locked
@@ -1282,7 +1282,7 @@ function showWalletList(wallets) {
     table += '</tbody></table>';
     const resultDiv = document.getElementById("result");
     resultDiv.innerHTML = table;
-    resultDiv.style.visibility = 'visible';
+    resultDiv.style.display = 'flex';
     resultDiv.style.fontSize = '80px';
     showDivs(['balance']);
 }
@@ -1316,11 +1316,11 @@ wrapper.style.display = 'block';
    const addr = document.getElementById("address")
    const qr = document.getElementById("qrcode")
 
-wrapper.style.visibility = 'visible';
+wrapper.style.display = 'flex';
 addr.innerHTML = address;
 qr.innerHTML = '';
-addr.style.visibility = 'visible';
-qr.style.visibility = 'visible';
+addr.style.display = 'flex';
+qr.style.display = 'flex';
 wrapper.style.marginTop = '-250px';
 //qr.style.marginTop = '-950px';
 
@@ -1398,7 +1398,7 @@ async function showSidechains() {
 
     // Optional: show a placeholder while detecting sidechains
     resultDiv.innerHTML = '<h3 style="font-family: Consolas, monospace;">CHOOSE A SIDECHAIN:</h3><p style="color:#888; font-family: Consolas, monospace; font-size:40px;">Checking available sidechains...</p>';
-    resultDiv.style.visibility = 'visible';
+    resultDiv.style.display = 'flex';
     resultDiv.style.fontSize = '50px';
     resultDiv.style.marginTop = '-1250px';
     resultDiv.style.textAlign = 'center';
@@ -1440,7 +1440,7 @@ async function showSidechains() {
         item.onmouseout = () => { item.style.background = '#111'; item.style.transform = 'scale(1)'; };
     });
 
-    resultDiv.style.visibility = 'visible';
+    resultDiv.style.display = 'flex';
 }
 
 
