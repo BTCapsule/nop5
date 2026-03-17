@@ -1283,36 +1283,66 @@ function showTransactions(transactions) {
 
 }
 
-function showAddressQRCode(address) {
-    hide(['mnemonicContainer', 'create_wallet', 'walletName', 'confirmWalletCreation', 'result', 'feerate', 'btcAddress', 'scanButton', 'btc', 'amount', 'confirm', 'reader']);
-    //showDivs(['qrcode', 'address', 'qrcode-wrapper']);
-
-
+function showAddressQRCode(transparentAddress, shieldedAddress) {
+    hide([
+        'mnemonicContainer',
+        'create_wallet',
+        'walletName',
+        'confirmWalletCreation',
+        'result',
+        'feerate',
+        'btcAddress',
+        'scanButton',
+        'btc',
+        'amount',
+        'confirm',
+        'reader'
+    ]);
 
     const wrapper = document.getElementById('qrcode-wrapper');
-wrapper.style.display = 'block';
+    wrapper.style.display = 'flex';
+    wrapper.style.flexDirection = 'row';
+    wrapper.style.justifyContent = 'space-around';
+    wrapper.style.alignItems = 'center';
+    wrapper.style.width = '512px';
+    wrapper.style.height = '256px';
+    wrapper.style.visibility = 'visible';
+    wrapper.style.marginTop = '-250px';
 
-    wrapper.style.width = wrapper.style.height = '512px';
-   const addr = document.getElementById("address")
-   const qr = document.getElementById("qrcode")
+    // Clear any existing content
+    wrapper.innerHTML = '';
 
-wrapper.style.visibility = 'visible';
-addr.innerHTML = address;
-qr.innerHTML = '';
-addr.style.visibility = 'visible';
-qr.style.visibility = 'visible';
-wrapper.style.marginTop = '-250px';
-//qr.style.marginTop = '-950px';
+    // Function to create a QR code canvas
+    function createQR(address) {
+        const qrDiv = document.createElement('div');
+        new QRCode(qrDiv, {
+            text: `bitcoin:${address}`,
+            width: 256,
+            height: 256,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+        });
+        return qrDiv;
+    }
 
-//addr.style.marginTop = '-550px';
-    new QRCode(document.getElementById("qrcode"), {
-        text: `bitcoin:${address}`,
-        width: 512,
-        height: 512,
-        colorDark: "#000000",
-        colorLight: "#ffffff",
-        correctLevel: QRCode.CorrectLevel.H
-    })
+    // Transparent address
+    if (transparentAddress) {
+        const tContainer = document.createElement('div');
+        tContainer.style.textAlign = 'center';
+        tContainer.innerHTML = `<strong>Transparent:</strong><br>${transparentAddress}`;
+        tContainer.appendChild(createQR(transparentAddress));
+        wrapper.appendChild(tContainer);
+    }
+
+    // Shielded address
+    if (shieldedAddress) {
+        const sContainer = document.createElement('div');
+        sContainer.style.textAlign = 'center';
+        sContainer.innerHTML = `<strong>Shielded:</strong><br>${shieldedAddress}`;
+        sContainer.appendChild(createQR(shieldedAddress));
+        wrapper.appendChild(sContainer);
+    }
 }
 
 
