@@ -228,7 +228,7 @@ position: relative;
 
 
       #html5-qrcode-button-camera-stop {
-        visibility: hidden;
+        display: none;
       }
     
 
@@ -350,7 +350,7 @@ list-style: none;
       <div id="center">
  <div id="reader" style="display:none; margin:auto;"></div>
 
-	<div id="create_wallet" style="visibility: hidden; text-align: right;">
+	<div id="create_wallet" style="display: none; text-align: right;">
 
 	 <input type="text" id="walletName" placeholder="Enter wallet name">
 	 <br><br>
@@ -448,7 +448,7 @@ function showDivs(divIds) {
 
     for (let div of divs) {
         if (!div.classList.contains('exclude')) {
-            div.style.visibility = 'hidden';
+            div.style.display = 'none';
             div.style.height = "0px";
         }
     }
