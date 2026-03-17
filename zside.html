@@ -94,11 +94,11 @@ list-style: none
       #qrcode {
         text-align: center;
         height: 0;
-position: relative;
+position: absolute;
       }
 
       #qrcode-wrapper {
-position: relative;
+position: absolute;
         margin-top: 610px;
         margin-right: 10px;
         
@@ -113,8 +113,8 @@ position: relative;
     margin-top: 600px;
 
     display: flex;
-    flex-direction: column; 
-    align-items: center;    
+    flex-direction: column;   /* 🔥 KEY */
+    align-items: center;      /* center horizontally */
 
     width: 600px;
     margin-left: auto;
@@ -228,7 +228,7 @@ position: relative;
 
 
       #html5-qrcode-button-camera-stop {
-        display: none;
+        visibility: hidden;
       }
     
 
@@ -350,7 +350,7 @@ list-style: none;
       <div id="center">
  <div id="reader" style="display:none; margin:auto;"></div>
 
-	<div id="create_wallet" style="display: none; text-align: right;">
+	<div id="create_wallet" style="visibility: hidden; text-align: right;">
 
 	 <input type="text" id="walletName" placeholder="Enter wallet name">
 	 <br><br>
@@ -448,7 +448,7 @@ function showDivs(divIds) {
 
     for (let div of divs) {
         if (!div.classList.contains('exclude')) {
-            div.style.display = 'none';
+            div.style.visibility = 'hidden';
             div.style.height = "0px";
         }
     }
@@ -456,7 +456,7 @@ function showDivs(divIds) {
     for (let id of divIds) {
         let elem = document.getElementById(id);
         if (elem) {
-            elem.style.display = 'flex';
+            elem.style.visibility = 'visible';
             elem.style.height = "auto";   // ← restore height
         }
     }
@@ -483,7 +483,7 @@ function showInfo(info) {
     resultDiv.innerHTML = '';
 
     // Hide other UI elements
-    hide(['center-results',
+    hide([
         'mnemonicContainer', 'create_wallet', 'walletName', 'confirmWalletCreation',
         'btcAddress', 'feerate', 'scanButton', 'btc', 'amount', 'confirm',
         'qrcode-wrapper', 'qrcode', 'address'
@@ -504,7 +504,7 @@ function showInfo(info) {
     if (!info || !Array.isArray(info) || info.length === 0) {
         container.innerHTML = '<p style="color:#ff6b6b;">No transactions found.</p>';
         resultDiv.appendChild(container);
-        resultDiv.style.display = 'flex';
+        resultDiv.style.visibility = 'visible';
         resultDiv.style.marginTop = '-1250px';
         return;
     }
@@ -553,7 +553,7 @@ function showInfo(info) {
 
     resultDiv.appendChild(container);
 
-    resultDiv.style.display = 'flex';
+    resultDiv.style.visibility = 'visible';
     resultDiv.style.marginTop = '-1250px';
     resultDiv.style.fontSize = '16px';
 }
@@ -568,7 +568,7 @@ async function showDeposit() {
     resultDiv.innerHTML = '';
 
     // Hide everything unrelated
-    hide(['center-results',
+    hide([
         'mnemonicContainer','create_wallet','walletName','confirmWalletCreation',
         'btcAddress','feerate','scanButton','confirm',
         'qrcode-wrapper','qrcode','address', 'amount', 'btc'
@@ -584,7 +584,7 @@ async function showDeposit() {
 
         if (!rawAddress || typeof rawAddress !== 'string') {
             resultDiv.innerHTML = `<p style="color:#ff6b6b; font-size:18px;">Failed to get deposit address</p>`;
-            resultDiv.style.display = 'flex';
+            resultDiv.style.visibility = 'visible';
             return;
         }
 
@@ -714,7 +714,7 @@ async function showDeposit() {
 
         });
 
-        resultDiv.style.display = 'flex';
+        resultDiv.style.visibility = 'visible';
         resultDiv.style.marginTop = '-1250px';
 
     } catch(err) {
@@ -722,7 +722,7 @@ async function showDeposit() {
         console.error("showDeposit error:", err);
 
         resultDiv.innerHTML = `<p style="color:#ff6b6b; font-size:18px;">Error fetching deposit address</p>`;
-        resultDiv.style.display = 'flex';
+        resultDiv.style.visibility = 'visible';
 
     } finally {
 
@@ -740,7 +740,7 @@ async function showDeposit() {
 function hide(elementIds) {
     for (let id of elementIds) {
         let elem = document.getElementById(id);
-        if (elem) elem.style.display = 'none';
+        if (elem) elem.style.visibility = 'hidden';
     }
 }
 
@@ -759,10 +759,10 @@ document.getElementById("scanButton").addEventListener("click", async () => {
     const reader = document.getElementById("reader");
 
     // Hide form elements so camera takes over
-    hide(['center-results','btcAddress', 'amount', 'scanButton', 'btc', 'confirm']);
+    hide(['btcAddress', 'amount', 'scanButton', 'btc', 'confirm']);
 
-    reader.style.display = "flex";
-//reader.style.visibility = "visible";
+    reader.style.display = "block";
+reader.style.visibility = "visible";
 
     if (!scanner) {
         scanner = new Html5Qrcode("reader");
@@ -825,7 +825,7 @@ function handleScannedText(text) {
 
 document.getElementById("sendButton").addEventListener("click", () => {
 
-hide(['center-results','mnemonicContainer', 'create_wallet', 'walletName', 'confirmWalletCreation', 'result', 'feerate', 'qrcode', 'address', 'qrcode-wrapper']);
+hide(['mnemonicContainer', 'create_wallet', 'walletName', 'confirmWalletCreation', 'result', 'feerate', 'qrcode', 'address', 'qrcode-wrapper']);
 
 const amt = document.getElementById("amount");
 amt.style.display = "none";
@@ -841,11 +841,11 @@ amt.style.display = "inline-block";
     // restore hidden elements
 
 document.getElementById("btcForm").style.display = "block";
-    document.getElementById("btcAddress").style.display = 'flex';
-    document.getElementById("amount").style.display = 'flex';
-    document.getElementById("scanButton").style.display = 'flex';
-    document.getElementById("btc").style.display = 'flex';
-    document.getElementById("confirm").style.display = 'flex';
+    document.getElementById("btcAddress").style.visibility = "visible";
+    document.getElementById("amount").style.visibility = "visible";
+    document.getElementById("scanButton").style.visibility = "visible";
+    document.getElementById("btc").style.visibility = "visible";
+    document.getElementById("confirm").style.visibility = "visible";
 
 });
 
@@ -864,7 +864,7 @@ document.getElementById("confirm").addEventListener("click", async (e) => {
     const confirmBtn = document.getElementById("confirm");
     const balanceEl = document.getElementById("balance");
 
-    resultDiv.style.display = 'flex';
+    resultDiv.style.visibility = "visible";
     resultDiv.innerHTML = "";
 
     // Prevent sending if balance already locked
@@ -1233,7 +1233,7 @@ async function handleReceive() {
     shieldBtn.innerText = "Shield";
     shieldBtn.style.fontSize = "36px";
     shieldBtn.style.padding = "15px 30px";
-    shieldBtn.style.marginTop = "100px";
+    shieldBtn.style.marginTop = "200px";
   //  shieldBtn.style.display = "block";
   //  shieldBtn.style.marginBottom = "-100px";
     shieldBtn.style.backgroundColor = "#ffffff";
@@ -1282,7 +1282,7 @@ function showWalletList(wallets) {
     table += '</tbody></table>';
     const resultDiv = document.getElementById("result");
     resultDiv.innerHTML = table;
-    resultDiv.style.display = 'flex';
+    resultDiv.style.visibility = 'visible';
     resultDiv.style.fontSize = '80px';
     showDivs(['balance']);
 }
@@ -1316,11 +1316,11 @@ wrapper.style.display = 'block';
    const addr = document.getElementById("address")
    const qr = document.getElementById("qrcode")
 
-wrapper.style.display = 'flex';
+wrapper.style.visibility = 'visible';
 addr.innerHTML = address;
 qr.innerHTML = '';
-addr.style.display = 'flex';
-qr.style.display = 'flex';
+addr.style.visibility = 'visible';
+qr.style.visibility = 'visible';
 wrapper.style.marginTop = '-250px';
 //qr.style.marginTop = '-950px';
 
@@ -1390,7 +1390,7 @@ async function showSidechains() {
     let resultDiv = document.getElementById("result");
 
     // Hide other UI elements
-    hide(['center-results',
+    hide([
         'mnemonicContainer','create_wallet','walletName','confirmWalletCreation',
         'btcAddress','feerate','scanButton','btc','amount','confirm',
         'qrcode-wrapper','qrcode','address','reader'
@@ -1398,7 +1398,7 @@ async function showSidechains() {
 
     // Optional: show a placeholder while detecting sidechains
     resultDiv.innerHTML = '<h3 style="font-family: Consolas, monospace;">CHOOSE A SIDECHAIN:</h3><p style="color:#888; font-family: Consolas, monospace; font-size:40px;">Checking available sidechains...</p>';
-    resultDiv.style.display = 'flex';
+    resultDiv.style.visibility = 'visible';
     resultDiv.style.fontSize = '50px';
     resultDiv.style.marginTop = '-1250px';
     resultDiv.style.textAlign = 'center';
@@ -1440,7 +1440,7 @@ async function showSidechains() {
         item.onmouseout = () => { item.style.background = '#111'; item.style.transform = 'scale(1)'; };
     });
 
-    resultDiv.style.display = 'flex';
+    resultDiv.style.visibility = 'visible';
 }
 
 
