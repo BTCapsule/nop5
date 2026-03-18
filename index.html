@@ -1,980 +1,928 @@
-  <!DOCTYPE html>
-  <html>
-     <meta name="viewport" content="width=1000, maximum-scale=1, user-scalable=no">
-    <meta name="application-name" content="LayerTwoLabs">
-    <meta name="msapplication-TileColor" content="#ffffff">
-    <meta name="msapplication-TileImage" content="https://btcapsule.com/images/qrCode.png">
-    <meta name="theme-color" content="#000000">
-    <link rel="apple-touch-icon" href="https://btcapsule.com/images/qrCode.png" />
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <meta name="apple-mobile-web-app-title" content="Mainchain">
-    <meta name="mobile-web-app-capable" content="yes">
-    <head>
-      <script src="https://unpkg.com/html5-qrcode"></script>
-    </head>
-    <style>
-      body {
-        color: white;
-        background: black;
-      }
+<!DOCTYPE html>
+<html>
+  <meta name="viewport" content="width=1000, maximum-scale=1, user-scalable=no">
+  <meta name="application-name" content="LayerTwoLabs">
+  <meta name="msapplication-TileColor" content="#ffffff">
+  <meta name="msapplication-TileImage" content="https://btcapsule.com/images/qrCode.png">
+  <meta name="theme-color" content="#000000">
+  <link rel="apple-touch-icon" href="https://btcapsule.com/images/qrCode.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Mainchain">
+  <meta name="mobile-web-app-capable" content="yes">
+  <head>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+  </head>
 
-      h2 {
-        color: white;
-        font-size: 60px;
-        font-family: sans-serif;
-        margin-bottom: 20px;
-        margin-left: 40px;
-        top: 20px;
-      }
+  <style>
+    /* =============================================
+       DESIGN TOKENS
+    ============================================= */
+    :root {
+      --color-bg:           #000000;
+      --color-fg:           #ffffff;
+      --color-muted:        #888888;
+      --color-dim:          #333333;
+      --color-panel-bg:     #111111;
+      --color-accent-green: #4ec9b0;
+      --color-accent-red:   #ff6b6b;
+      --color-accent-blue:  #9cdcfe;
+      --color-border:       #ffffff;
 
-      button {
-        background-color: #ffffff;
-        color: black;
-        padding: 20px 25px;
-        text-align: center;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 24px;
-        margin: 10px;
-        
-      }
+      --font-ui:    sans-serif;
+      --font-mono:  Consolas, monospace;
 
-      th,
-      td {
-        padding: 15px;
-        text-align: left;
-      }
+      --fs-title:   60px;
+      --fs-balance: 100px;
+      --fs-body:    34px;
+      --fs-input:   32px;
+      --fs-amount:  80px;
+      --fs-btc:     60px;
+      --fs-btn:     24px;
+      --fs-confirm: 50px;
+      --fs-tx:      46px;
+      --fs-sidechain-item: 48px;
 
-      table,
-      th,
-      td {
-        border: 1px solid;
-      }
+      --btn-padding: 20px 25px;
+      --btn-margin:  10px;
+    }
 
-      th {
-        background-color: black;
-        color: white;
-      }
+    /* =============================================
+       RESET / BASE
+    ============================================= */
+    body {
+      color: var(--color-fg);
+      background: var(--color-bg);
+      margin: 0;
+      padding: 0;
+    }
 
-      tr:hover {
-        background-color: #D6EEEE;
-      }
+    h2 {
+      color: var(--color-fg);
+      font-size: var(--fs-title);
+      font-family: var(--font-ui);
+      margin-bottom: 20px;
+      margin-left: 40px;
+      margin-top: 20px;
+    }
 
-      tr:nth-child(even) {
-        background-color: black;
-        color: white;
-      }
+    li {
+      list-style: none;
+    }
 
-li {
-list-style: none
-}
+    /* =============================================
+       TABLES
+    ============================================= */
+    th, td {
+      padding: 15px;
+      text-align: left;
+    }
 
-      .center-table {
-        margin-left: auto;
-        margin-right: auto;
-      }
+    table, th, td {
+      border: 1px solid var(--color-border);
+    }
 
-      #balance {
-        color: white;
-        font-size: 100px;
-        font-family: sans-serif;
-        text-align: center;
-        margin-top: 30px;
-      }
+    th {
+      background-color: var(--color-bg);
+      color: var(--color-fg);
+    }
 
-      #center {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-top: 15px;
-        margin-bottom: 15px;
-      }
+    tr:hover {
+      background-color: #D6EEEE;
+    }
 
-      #qrcode {
-        text-align: center;
-        height: 0;
-position: absolute;
-      }
+    tr:nth-child(even) {
+      background-color: var(--color-bg);
+      color: var(--color-fg);
+    }
 
-      #qrcode-wrapper {
-position: absolute;
-        margin-top: 610px;
-        margin-right: 10px;
-        
-        background-color: white;
-        display: none;
-      }
+    .center-table {
+      margin-left: auto;
+      margin-right: auto;
+    }
 
-      #address {
-        color: white;
-        font-size: 36px;
-        font-family: sans-serif;
-        text-align: center;
-        margin-top: 200px;
-        margin-right: auto;
-position: absolute;
-        margin-left: auto;
-        justify-content: center;
-        bottom: 500px;
-        width: 600px;
-        display: flex;
-        word-wrap: break-word;
-      }
+    /* =============================================
+       BUTTONS
+    ============================================= */
+    button {
+      background-color: var(--color-fg);
+      color: var(--color-bg);
+      padding: var(--btn-padding);
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: var(--fs-btn);
+      margin: var(--btn-margin);
+      cursor: pointer;
+      border: none;
+    }
 
-      #transactions {
-        font-family: sans-serif;
-        font-size: 46px;
-      }
+    /* =============================================
+       LAYOUT: CHROME (header, top nav, bottom nav)
+    ============================================= */
 
-      #sendForm {
-        position: absolute;
-        top: 400px;
-        margin-left: auto;
-        margin-right: auto;
-      }
+    /* Balance display */
+    #balance {
+      color: var(--color-fg);
+      font-size: var(--fs-balance);
+      font-family: var(--font-ui);
+      text-align: center;
+      margin-top: 30px;
+    }
 
-      #button-container {
-        display: flex;
-        justify-content: center;
-        display:flex;
-      }
+    /* Top navigation buttons */
+    #button-container {
+      display: flex;
+      justify-content: center;
+    }
 
-      #button-container2 {
-        position: relative;
-        bottom: 80px;
-        left: 0;
-        right: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
+    /* Bottom RECEIVE / SEND buttons — fixed to viewport bottom */
+    #button-container2 {
+      position: fixed;
+      bottom: 20px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+    }
 
-      #amount-container {
-        display: inline-block;
-      }
+    /* =============================================
+       LAYOUT: MIDDLE PANEL
+       This is the single zone all views render into.
+       All view panels are display:none by default;
+       JS shows the active one.
+    ============================================= */
+    #panel {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 400px;
+      padding-bottom: 120px; /* clear fixed bottom buttons */
+      margin-top: 15px;
+    }
 
-      #amount,
-      #btc {
-        display: inline-block;
-        vertical-align: middle;
-      }
+    /* =============================================
+       VIEW: INFO / TRANSACTIONS  (#view-info)
+    ============================================= */
+    #view-info {
+      display: none;
+      font-family: var(--font-mono);
+      font-size: var(--fs-body);
+      color: #d4d4d4;
+      padding: 15px;
+      border-radius: 8px;
+      max-height: 60vh;
+      overflow-y: auto;
+      width: 100%;
+      max-width: 900px;
+    }
 
-      #amount {
-        background-color: black;
-        color: white;
-        font-size: 80px;
-        width: 100px;
-        text-align: center;
-        margin-left: auto;
-        margin-right: auto;
-        border: none;
-        outline: none;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-      }
+    /* Transaction list */
+    .tx-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
 
-      #btcAddress {
-        margin-top: 200px;
-        background-color: black;
-        color: white;
-        font-size: 32px;
-        width: 800px;
-        border: none;
-        outline: none;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-        margin-left: auto;
-        margin-right: auto;
-        text-align: center;
-        border-bottom: 1px solid white;
-      }
+    .tx-item {
+      padding: 12px 0;
+      border-bottom: 1px solid var(--color-dim);
+    }
 
+    .tx-row {
+      display: flex;
+      align-items: center;
+      gap: 300px;
+    }
 
+    .tx-id {
+      color: var(--color-accent-blue);
+      font-weight: bold;
+    }
 
-      #walletName {
-        margin-top: 200px;
-        background-color: black;
-        color: white;
-        font-size: 32px;
-        width: 800px;
-        border: none;
-        outline: none;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-        margin-left: auto;
-        margin-right: auto;
-        text-align: center;
-        border-bottom: 1px solid white;
-      }
+    .tx-amount-out {
+      color: var(--color-accent-red);
+      font-weight: bold;
+    }
 
+    .tx-amount-in {
+      color: var(--color-accent-green);
+      font-weight: bold;
+    }
 
-      #feerate {
-        color: white;
-        font-size: 36px;
-        font-family: sans-serif;
-        text-align: center;
-       
-        margin-right: auto;
+    .tx-amount-unknown {
+      color: var(--color-muted);
+    }
 
-        margin-left: auto;
-        justify-content: center;
-        word-wrap: break-word;
-      }
+    .tx-time {
+      color: var(--color-muted);
+      font-size: 0.85em;
+      margin-top: 4px;
+    }
 
+    .tx-empty {
+      color: var(--color-accent-red);
+    }
 
-      #html5-qrcode-button-camera-stop {
-        visibility: hidden;
-      }
-    
+    /* =============================================
+       VIEW: RECEIVE / QR CODE  (#view-receive)
+    ============================================= */
+    #view-receive {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+    }
 
-     
-	.word {
-	 font-family: sans-serif;
-	 font-size: 48px;
-	 color: black;
-	 background-color: white;
-	 margin: 10px;
-	 padding: 10px;
-	}
-	   
-#popup {
- position: absolute;
- 
- width: 400px;
- height: 900px;
- 
- background-color: white;
-margin-top: -400px;
-}
+    #qrcode-wrapper {
+      border: 10px solid var(--color-border);
+      padding: 10px;
+      background-color: var(--color-fg);
+      width: 512px;
+      height: 512px;
+    }
 
-#reader {
-    
-    top: 120px;
-    left: 225px;
-    transform: translateX(-50%);
-    width: 1000px;
-    
-    height: 600px;
-    
-}
+    #qrcode {
+      text-align: center;
+    }
 
+    #address {
+      color: var(--color-fg);
+      font-size: var(--fs-input);
+      font-family: var(--font-ui);
+      text-align: center;
+      word-wrap: break-word;
+      max-width: 600px;
+    }
 
-#reader video {
-    width: 500% !important;
-    height: 100% !important;
-    object-fit: cover;
-}
-.popup-content {
- background-color: red;
- margin: 15% auto;
- padding: 20px;
- border: 1px solid #888;
- width: 80%;
-}
+    /* =============================================
+       VIEW: SEND FORM  (#view-send)
+    ============================================= */
+    #view-send {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+    }
 
-#dawg {
-Background-color:black;
-height: 500px;
-} 
+    /* Amount row */
+    .amount-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
 
-.sidechain-list {
-  list-style-type: none;
-  padding-left: 0;
-list-style: none;
-}
+    #amount {
+      background-color: var(--color-bg);
+      color: var(--color-fg);
+      font-size: var(--fs-amount);
+      width: 200px;
+      text-align: center;
+      border: none;
+      outline: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+    }
 
-.sidechain-list li {
-  margin-bottom: 10px;
-  cursor: pointer;
-list-style: none;
+    #btc-label {
+      font-size: var(--fs-btc);
+      font-family: var(--font-mono);
+      color: var(--color-fg);
+    }
 
-}
+    #btcAddress {
+      background-color: var(--color-bg);
+      color: var(--color-fg);
+      font-size: var(--fs-input);
+      width: 800px;
+      border: none;
+      outline: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      text-align: center;
+      border-bottom: 1px solid var(--color-fg);
+      margin-top: 30px;
+    }
 
-.sidechain-list li:hover {
-  text-decoration: underline;
+    #feerate {
+      color: var(--color-fg);
+      font-size: var(--fs-input);
+      font-family: var(--font-ui);
+      text-align: center;
+      word-wrap: break-word;
+      margin-top: 10px;
+    }
 
-}
+    #confirm {
+      display: block;
+      margin: 40px auto 0;
+      font-size: var(--fs-confirm);
+      color: var(--color-bg);
+    }
 
-.sidechain-input {
-  background-color: black;
-  color: white;
-  font-size: 32px;
-  width: 800px;
-  border: none;
-  outline: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  margin-left: auto;
-  margin-right: auto;
-  text-align: center;
-  border-bottom: 1px solid white;
-  margin-top: 20px;
-  display: block;
-}
+    /* QR Scanner inside send view */
+    #reader {
+      width: 700px;
+      height: 500px;
+    }
 
-.sidechain-button {
-  background-color: #ffffff;
-  color: black;
-  padding: 20px 25px;
-  text-align: center;
-  text-decoration: none;
-  display: block;
-  font-size: 24px;
-  margin: 20px auto;
-  
-  margin-bottom: 400px;
-}
+    /* =============================================
+       VIEW: SIDECHAINS  (#view-sidechains)
+    ============================================= */
+    #view-sidechains {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 50px;
+      text-align: center;
+    }
 
+    .sidechain-list {
+      list-style: none;
+      padding: 0;
+      margin: 20px auto;
+      max-width: 600px;
+      text-align: center;
+    }
 
-.json-viewer pre {
-    white-space: pre-wrap;
-    word-wrap: break-word;
-}
+    .sidechain-item {
+      font-size: var(--fs-sidechain-item);
+      padding: 20px;
+      margin: 10px auto;
+      cursor: pointer;
+      background: var(--color-panel-bg);
+      font-family: var(--font-mono);
+      color: var(--color-fg);
+      border-radius: 12px;
+      transition: background 0.2s ease-in-out, transform 0.2s ease-in-out;
+    }
 
-.json-key {
-    color: #9cdcfe; /* light blue for keys */
-    font-weight: bold;
-}
+    .sidechain-item:hover {
+      background: var(--color-dim);
+      transform: scale(1.05);
+    }
 
-.json-string {
-    color: #ce9178; /* orange-red for strings */
-}
+    .sidechain-checking {
+      color: var(--color-muted);
+      font-family: var(--font-mono);
+      font-size: 40px;
+    }
 
-.json-number {
-    color: #b5cea8; /* green for numbers */
-}
+    /* =============================================
+       VIEW: CREATE WALLET  (#view-create-wallet)
+    ============================================= */
+    #view-create-wallet {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
 
-.json-boolean {
-    color: #569cd6; /* blue for true/false */
-}
+    #walletName {
+      background-color: var(--color-bg);
+      color: var(--color-fg);
+      font-size: var(--fs-input);
+      width: 800px;
+      border: none;
+      outline: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      text-align: center;
+      border-bottom: 1px solid var(--color-fg);
+    }
 
-.json-null {
-    color: #569cd6;
-    font-style: italic;
-}
+    .sidechain-input {
+      background-color: var(--color-bg);
+      color: var(--color-fg);
+      font-size: var(--fs-input);
+      width: 800px;
+      border: none;
+      outline: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      text-align: center;
+      border-bottom: 1px solid var(--color-fg);
+      margin-top: 20px;
+      display: block;
+    }
 
-.json-keyword {
-    color: #569cd6;
-}
+    /* =============================================
+       VIEW: MNEMONIC  (#view-mnemonic)
+    ============================================= */
+    #view-mnemonic {
+      display: none;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
 
-details summary {
-    list-style: none; /* hide default arrow */
-}
+    .word {
+      font-family: var(--font-ui);
+      font-size: 48px;
+      color: var(--color-bg);
+      background-color: var(--color-fg);
+      margin: 10px;
+      padding: 10px;
+    }
 
-details summary::-webkit-details-marker {
-    display: none;
-}
+    /* =============================================
+       VIEW: RESULT  (#view-result)
+       Generic text / status output view
+    ============================================= */
+    #view-result {
+      display: none;
+      font-family: var(--font-mono);
+      font-size: var(--fs-body);
+      color: #d4d4d4;
+      padding: 15px;
+      border-radius: 8px;
+      max-height: 60vh;
+      overflow-y: auto;
+      width: 100%;
+      max-width: 900px;
+      text-align: center;
+    }
 
-details summary::before {
-    content: "▶ ";
-    color: #4ec9b0;
-}
+    /* =============================================
+       JSON VIEWER SYNTAX HIGHLIGHTING
+    ============================================= */
+    .json-viewer pre {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
 
-details[open] summary::before {
-    content: "▼ ";
-}
+    .json-key     { color: var(--color-accent-blue);  font-weight: bold; }
+    .json-string  { color: #ce9178; }
+    .json-number  { color: #b5cea8; }
+    .json-boolean { color: #569cd6; }
+    .json-null    { color: #569cd6; font-style: italic; }
+    .json-keyword { color: #569cd6; }
 
+    /* =============================================
+       COLLAPSIBLE DETAILS
+    ============================================= */
+    details summary { list-style: none; }
+    details summary::-webkit-details-marker { display: none; }
+    details summary::before       { content: "▶ "; color: var(--color-accent-green); }
+    details[open] summary::before { content: "▼ "; }
 
+    /* =============================================
+       UTILITY
+    ============================================= */
+    .hidden { display: none !important; }
 
-    </style>
-    <body>
-     
-      <h2 class="exclude">Mainchain</h2>
-      <br>
-      <br>
-      <div id="button-container" class="exclude">
-          <button id="displayBalance" onclick="rpc('wallet', 'GetBalance')">balance</button>
-<button onclick="rpc('wallet', 'ListTransactions')">info</button>
-<button onclick="rpc('wallet', 'CreateNewAddress')">address</button>
-<button onclick="rpc('validator', 'GetSidechains')">sidechains</button>
-	</div>
+    /* Hide the html5-qrcode stop button — it's controlled programmatically */
+    #html5-qrcode-button-camera-stop {
+      display: none;
+    }
 
-      <div id="balance"></div>
-      <br>
-      <br>
-      <div id="center">
- <div id="reader" style="display:none; margin:auto;"></div>
+    /* Popup (unused visually but kept for completeness) */
+    #popup {
+      position: absolute;
+      width: 400px;
+      height: 900px;
+      background-color: var(--color-fg);
+    }
 
-	<div id="create_wallet" style="visibility: hidden; text-align: right;">
+    #dawg {
+      background-color: var(--color-bg);
+      height: 500px;
+    }
 
-	 <input type="text" id="walletName" placeholder="Enter wallet name">
-	 <br><br>
-	 <button id="confirmWalletCreation">NEXT</button>
-	</div>
-</div>
+    .sidechain-button {
+      background-color: var(--color-fg);
+      color: var(--color-bg);
+      padding: var(--btn-padding);
+      text-align: center;
+      display: block;
+      font-size: var(--fs-btn);
+      margin: 20px auto;
+    }
 
-<div id="center">
-        <div id="mnemonicContainer">
-        </div>
+  </style>
+
+  <body>
+
+    <!-- ── HEADER ─────────────────────────────── -->
+    <h2 class="exclude">Mainchain</h2>
+    <br><br>
+
+    <!-- ── TOP NAV BUTTONS ───────────────────── -->
+    <div id="button-container" class="exclude">
+      <button id="displayBalance" onclick="rpc('wallet', 'GetBalance')">balance</button>
+      <button onclick="showView('info'); rpc('wallet', 'ListTransactions')">info</button>
+      <button onclick="rpc('wallet', 'CreateNewAddress')">address</button>
+      <button onclick="rpc('validator', 'GetSidechains')">sidechains</button>
+    </div>
+
+    <!-- ── BALANCE ────────────────────────────── -->
+    <div id="balance"></div>
+    <br><br>
+
+    <!-- ══════════════════════════════════════════
+         MIDDLE PANEL — one zone, all views live here
+    ═══════════════════════════════════════════ -->
+    <div id="panel">
+
+      <!-- VIEW: INFO / TRANSACTIONS -->
+      <div id="view-info">
+        <!-- populated by showInfo() -->
       </div>
 
-
-
-
-
-<div id="center">
-        <div id="qrcode-wrapper" style="border: 10px solid white; display: none; padding: 10px;">
+      <!-- VIEW: RECEIVE -->
+      <div id="view-receive">
+        <div id="qrcode-wrapper">
           <div id="qrcode"></div>
         </div>
+        <div id="address"></div>
       </div>
 
-      <br>
-      <br>
-      <div id="center">
-        <div id="transactions"></div>
-      </div>
-      <br>
-      <br>
-      <br>
-      <div id="center-results" style="display: flex; margin-top: 400px; justify-content: center; align-items: center;">
-        <p id="result" style="justify-content:center; align-items:center; text-align: center;"></p>
- <div id="address"></div>
-      </div>
-       
-      
-      <div id="button-container2" class="exclude">
-        <button class="exclude" onclick="rpc('wallet', 'CreateNewAddress'); setTimeout(function() {document.getElementById('qrcode-wrapper').style.display = 'inline-block';}, 500)"> RECEIVE</button>
-        <button style="width:155px;" id="sendButton" class="exclude">SEND</button> 
-      </div>
-      <br>
-      <br>
+      <!-- VIEW: SEND -->
+      <div id="view-send">
+        <div id="reader" class="hidden"></div>
 
-      <br>
-      <div id="center">
-        <div id="sendForm" style="display: none;">
-          <form id="btcForm" style="margin-left: auto; margin-right: auto; text-align: center;">
-            <label for="amount"></label>
-            <br>
-            <div id="amount-container">
-              <input type="number" id="amount" name="amount" min="0" value="0" maxlength="15" style="display: inline-block; vertical-align: middle;">
-              <p id="btc" style="display: inline-block; vertical-align: middle; font-size: 60px; font-family: monospace;"> BTC</p>
-              <br>
-              <br>
-              <button id="scanButton" class="exclude" type="button">SCAN</button>
-            </div>
-            <label for="btcAddress"></label>
-            <br>
-            <input type="text" id="btcAddress" name="btcAddress" placeholder="Enter Address">
-            <br><br>
-               <p id="feerate"></p>            
-            <button id="confirm" style="display: block; margin: auto; text-align: center; font-size:50px; margin-top: 110px; color: black;">CONFIRM</button>
-          </form>
-
+        <div id="btcForm">
+          <div class="amount-row">
+            <input type="number" id="amount" name="amount" min="0" value="0" maxlength="15">
+            <span id="btc-label">BTC</span>
+          </div>
+          <br><br>
+          <button id="scanButton" class="exclude" type="button">SCAN</button>
+          <br>
+          <input type="text" id="btcAddress" name="btcAddress" placeholder="Enter Address">
+          <br><br>
+          <p id="feerate"></p>
+          <button id="confirm">CONFIRM</button>
         </div>
       </div>
-      <br>
-        <br>
-        <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
-<script>
-let timer = null;
-let confirmedBalance = 0;
-let unconfirmedBalance = 0;
 
+      <!-- VIEW: SIDECHAINS -->
+      <div id="view-sidechains">
+        <!-- populated by showSidechains() -->
+      </div>
 
+      <!-- VIEW: CREATE WALLET -->
+      <div id="view-create-wallet">
+        <input type="text" id="walletName" placeholder="Enter wallet name">
+        <br><br>
+        <button id="confirmWalletCreation">NEXT</button>
+      </div>
 
+      <!-- VIEW: MNEMONIC -->
+      <div id="view-mnemonic">
+        <!-- populated dynamically -->
+      </div>
 
-async function rpc(category, method, args = []) {
-    try {
+      <!-- VIEW: GENERIC RESULT -->
+      <div id="view-result">
+        <!-- populated for send confirmations, errors, etc. -->
+      </div>
+
+    </div><!-- /#panel -->
+
+    <!-- ── BOTTOM FIXED NAV ───────────────────── -->
+    <div id="button-container2" class="exclude">
+      <button class="exclude" id="receiveButton">RECEIVE</button>
+      <button style="width:155px;" id="sendButton" class="exclude">SEND</button>
+    </div>
+
+  </body>
+
+  <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+  <script>
+
+    let timer = null;
+    let confirmedBalance = 0;
+    let unconfirmedBalance = 0;
+
+    // ── VIEW MANAGER ────────────────────────────────────────────────────────
+    // All middle-panel views. showView() hides all then shows the target.
+    const ALL_VIEWS = [
+      'view-info',
+      'view-receive',
+      'view-send',
+      'view-sidechains',
+      'view-create-wallet',
+      'view-mnemonic',
+      'view-result',
+    ];
+
+    function showView(name) {
+      ALL_VIEWS.forEach(id => {
+        document.getElementById(id).style.display = 'none';
+      });
+      const el = document.getElementById('view-' + name);
+      if (el) {
+        // flex for views that use flex layout, block otherwise
+        const flexViews = ['receive', 'send', 'sidechains', 'create-wallet', 'mnemonic'];
+        el.style.display = flexViews.includes(name) ? 'flex' : 'block';
+      }
+    }
+
+    // ── RPC ──────────────────────────────────────────────────────────────────
+    async function rpc(category, method, args = []) {
+      try {
         const body = args.length ? { args } : undefined;
         const res = await fetch(`/${category}/${method}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: body ? JSON.stringify(body) : undefined
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: body ? JSON.stringify(body) : undefined
         });
         const data = await res.json();
         console.log(category, method, data);
 
-        // Balance
         if (method === 'GetBalance') {
-            const sats = data.result?.confirmedSats ? parseInt(data.result.confirmedSats, 10) : 0;
-            confirmedBalance = sats / 1e8;
+          const sats = data.result?.confirmedSats ? parseInt(data.result.confirmedSats, 10) : 0;
+          confirmedBalance = sats / 1e8;
         }
         document.getElementById('balance').innerHTML = `${confirmedBalance} BTC`;
 
-        // Result handlers
-        if (method === 'GetChainInfo')    showInfo(data.result);
-        if (method === 'GetSidechains')   showSidechains(data.result);
+        if (method === 'GetChainInfo')     showInfo(data.result);
+        if (method === 'GetSidechains')    showSidechainsView(data.result);
         if (method === 'ListTransactions') showInfo(data.result);
-        if (method === 'CreateNewAddress') { showAddressQRCode(data.result.address); console.log(data.result.address); }
-
-        return data;
-    } catch (err) {
-        console.error(`RPC Error: ${category}/${method}`, err);
-        return { error: err.toString() };
-    }
-}
-
-
-function showInfo(info) {
-    let resultDiv = document.getElementById("result");
-resultDiv.innerHTML = '';
-    // Hide other UI elements
-    hide([
-        'mnemonicContainer', 'create_wallet', 'walletName', 'confirmWalletCreation',
-        'btcAddress', 'feerate', 'scanButton', 'btc', 'amount', 'confirm',
-        'qrcode-wrapper', 'qrcode', 'address'
-    ]);
-
-    
-
-    // Create container
-    const container = document.createElement('div');
-    //container.style.background = '#1e1e1e';
-    container.style.padding = '15px';
-    container.style.borderRadius = '8px';
-    container.style.marginTop = '15px';
-    container.style.fontFamily = 'Consolas, monospace';
-    container.style.fontSize = '34px';
-    container.style.color = '#d4d4d4';
-    container.style.maxHeight = '60vh';
-    container.style.overflowY = 'auto';
-
-    // Check if we have transactions
-    if (!info.transactions || !Array.isArray(info.transactions) || info.transactions.length === 0) {
-        container.innerHTML = '<p style="color:#ff6b6b;">No transactions found.</p>';
-        resultDiv.appendChild(container);
-        resultDiv.style.visibility = 'visible';
-        resultDiv.style.marginTop = '-1250px';
-        return;
-    }
-
-    // Sort by confirmation height descending (highest = most recent)
-    const sortedTxs = [...info.transactions].sort((a, b) => {
-        const heightA = a.confirmationInfo?.height || 0;
-        const heightB = b.confirmationInfo?.height || 0;
-        return heightB - heightA;
-    });
-
-    // Take only the most recent 5
-    const recentTxs = sortedTxs.slice(0, 5);
-
-    // Build simple list
-    const ul = document.createElement('ul');
-    ul.style.listStyle = 'none';
-    ul.style.padding = '0';
-    ul.style.margin = '0';
-
-    recentTxs.forEach(tx => {
-        const li = document.createElement('li');
-        li.style.padding = '12px 0';
-        li.style.borderBottom = '1px solid #333';
-
-        // Short txid (first 6 chars)
-        const shortTxid = tx.txid?.hex?.substring(0, 6) || '??????';
-
-        // Amount: prefer sentSats if present (outgoing), else receivedSats (incoming)
-        let amountDisplay = '';
-        if (tx.sentSats) {
-            const sats = parseInt(tx.sentSats, 10);
-            amountDisplay = `<span style="color:#ff6b6b; font-weight:bold;">-${(sats / 1e8).toFixed(8)} BTC</span>`;
-        } else if (tx.receivedSats) {
-            const sats = parseInt(tx.receivedSats, 10);
-            amountDisplay = `<span style="color:#4ec9b0; font-weight:bold;">+${(sats / 1e8).toFixed(8)} BTC</span>`;
-        } else {
-            amountDisplay = '<span style="color:#888;">?</span>';
+        if (method === 'CreateNewAddress') {
+          showAddressQRCode(data.result.address);
+          console.log(data.result.address);
         }
 
+        return data;
+      } catch (err) {
+        console.error(`RPC Error: ${category}/${method}`, err);
+        return { error: err.toString() };
+      }
+    }
+
+    // ── SHOW INFO (transactions) ─────────────────────────────────────────────
+    function showInfo(info) {
+      showView('info');
+      const container = document.getElementById('view-info');
+      container.innerHTML = '';
+
+      if (!info?.transactions || !Array.isArray(info.transactions) || info.transactions.length === 0) {
+        container.innerHTML = '<p class="tx-empty">No transactions found.</p>';
+        return;
+      }
+
+      const sortedTxs = [...info.transactions].sort((a, b) => {
+        return (b.confirmationInfo?.height || 0) - (a.confirmationInfo?.height || 0);
+      });
+
+      const recentTxs = sortedTxs.slice(0, 5);
+      const ul = document.createElement('ul');
+      ul.className = 'tx-list';
+
+      recentTxs.forEach(tx => {
+        const li = document.createElement('li');
+        li.className = 'tx-item';
+
+        const shortTxid = tx.txid?.hex?.substring(0, 6) || '??????';
+
+        let amountHTML = '';
+        if (tx.sentSats) {
+          const sats = parseInt(tx.sentSats, 10);
+          amountHTML = `<span class="tx-amount-out">-${(sats / 1e8).toFixed(8)} BTC</span>`;
+        } else if (tx.receivedSats) {
+          const sats = parseInt(tx.receivedSats, 10);
+          amountHTML = `<span class="tx-amount-in">+${(sats / 1e8).toFixed(8)} BTC</span>`;
+        } else {
+          amountHTML = `<span class="tx-amount-unknown">?</span>`;
+        }
 
         const time = tx.confirmationInfo?.timestamp || 'unconfirmed';
 
         li.innerHTML = `
-            <div style="display:flex; align-items:center; gap:300px;">
-                <div>
-                    <span style="color:#9cdcfe; font-weight:bold;">${shortTxid}...</span>
-              
-                </div>
-                <div style="text-align:right;">
-                    ${amountDisplay}
-                </div>
-            </div>
-            <div style="color:#888; font-size:0.85em; margin-top:4px;">
-                ${time}
-            </div>
+          <div class="tx-row">
+            <div><span class="tx-id">${shortTxid}...</span></div>
+            <div style="text-align:right;">${amountHTML}</div>
+          </div>
+          <div class="tx-time">${time}</div>
         `;
-
         ul.appendChild(li);
-    });
+      });
 
-    container.appendChild(ul);
-
-    // If fewer than 5
-    if (recentTxs.length < info.transactions.length) {
-        const note = document.createElement('p');
-        note.style.color = '#888';
-        note.style.fontSize = '0.9em';
-        note.style.marginTop = '15px';
-       // note.textContent = `Showing most recent ${recentTxs.length} of ${info.transactions.length} total transactions`;
-        container.appendChild(note);
+      container.appendChild(ul);
     }
 
-    resultDiv.appendChild(container);
+    // ── SHOW ADDRESS + QR CODE ───────────────────────────────────────────────
+    function showAddressQRCode(address) {
+      showView('receive');
 
-    resultDiv.style.visibility = 'visible';
-    resultDiv.style.marginTop = '-1250px';
-    resultDiv.style.fontSize = '16px'; // readable size
-}
+      const qrEl = document.getElementById('qrcode');
+      qrEl.innerHTML = '';
 
+      document.getElementById('address').textContent = address;
 
-
-
-
-
-
-
-
-// Add some CSS classes for highlighting (add this to your <style> tag or external CSS)
-
-function hide(elementIds) {
-    for (let id of elementIds) {
-        let elem = document.getElementById(id);
-        if (elem) elem.style.visibility = 'hidden';
-    }
-}
-
-// Validate Bitcoin, Testnet, or Signet addresses
-function isValidBitcoinAddress(address) {
-    // Matches: bc1/tb1/sb1 (segwit) or 1/3 legacy addresses
-    return /^(bc1|tb1|sb1|[13])[a-zA-HJ-NP-Z0-9]{20,100}$/.test(address);
-}
-
-
-
-let scanner = null;
-
-document.getElementById("scanButton").addEventListener("click", async () => {
-
-    const reader = document.getElementById("reader");
-
-    // Hide form elements so camera takes over
-    hide(['btcAddress', 'amount', 'scanButton', 'btc', 'confirm']);
-
-    reader.style.display = "block";
-reader.style.visibility = "visible";
-
-    if (!scanner) {
-        scanner = new Html5Qrcode("reader");
-    }
-
-    try {
-        await scanner.start(
-            { facingMode: "environment" },
-            { fps: 10, qrbox: { width: 2000, height: 1000 } },
-            (decodedText) => {
-                console.log("QR RESULT:", decodedText);
-
-                handleScannedText(decodedText);
-
-                scanner.stop();
-                reader.style.display = "none";
-
-                       },
-            (errorMessage) => {
-                // ignore scan errors
-            }
-        );
-
-    } catch (err) {
-        console.error("Camera start failed:", err);
-         }
-
-});
-
-
-function handleScannedText(text) {
-
-    // Remove prefixes like bitcoin:, testnet:, signet:
-    let clean = text.replace(/^[a-zA-Z]+:/, "");
-
-    // Split off any query params
-    let parts = clean.split("?");
-    let address = parts[0];
-
-    // Parse amount if included
-    let amount = parts[1] ? new URLSearchParams(parts[1]).get("amount") : null;
-
-    // Validate the address
-    if (isValidBitcoinAddress(address)) {
-        document.getElementById("btcAddress").value = address;
-        if (amount) document.getElementById("amount").value = amount;
-    } else {
-        alert("Invalid Bitcoin, Testnet, or Signet address");
-    }
-}
-
-
-document.getElementById("sendButton").addEventListener("click", () => {
-
-hide(['mnemonicContainer', 'create_wallet', 'walletName', 'confirmWalletCreation', 'result', 'feerate', 'qrcode', 'address', 'qrcode-wrapper']);
-
-const amt = document.getElementById("amount");
-amt.style.display = "none";
-amt.offsetHeight;
-amt.style.display = "inline-block";
-    document.getElementById("sendForm").style.display = "block";
-
-    document.getElementById("reader").style.display = "none";
-
-    document.getElementById("btcAddress").value = "";
-    document.getElementById("amount").value = "0";
-
-    // restore hidden elements
-
-document.getElementById("btcForm").style.display = "block";
-    document.getElementById("btcAddress").style.visibility = "visible";
-    document.getElementById("amount").style.visibility = "visible";
-    document.getElementById("scanButton").style.visibility = "visible";
-    document.getElementById("btc").style.visibility = "visible";
-    document.getElementById("confirm").style.visibility = "visible";
-
-});
-
-
-function btcToSats(btc) {
-    return Math.floor(btc * 1e8); // converts BTC to satoshis
-}
-
-
-
-
-document.getElementById("confirm").addEventListener("click", async (e) => {
-    e.preventDefault();
-
-    const address = document.getElementById("btcAddress").value.trim();
-    const amountBtc = parseFloat(document.getElementById("amount").value);
-    const resultDiv = document.getElementById("result");
-    resultDiv.style.visibility = "visible";
-
-    // Validate address
-    if (!isValidBitcoinAddress(address)) {
-        alert("Invalid Bitcoin, Testnet, or Signet address");
-        return;
-    }
-
-    if (isNaN(amountBtc) || amountBtc <= 0) {
-        alert("Enter a valid amount");
-        return;
-    }
-
-    const amountSats = Math.floor(amountBtc * 1e8);
-
-    // Build request with proto-correct fields
-    const txRequest = {
-        destinations: {
-            [address]: amountSats
-        },
-        feeRate: {         // must match proto
-            sat_per_vbyte: 10
-        }
-    };
-
-    // Wrap in single quotes for logging (like grpcurl)
-    const singleQuotedJson = `'${JSON.stringify(txRequest, null, 2)}'`;
-
-    // Show user exactly what we are sending
-    resultDiv.innerHTML = `<p>Sending ${amountBtc} BTC to ${address}...</p>
-                           <pre>${singleQuotedJson}</pre>`;
-
-    console.log("Single-quoted JSON (for display/grpcurl style):");
-    console.log(singleQuotedJson);
-
-    try {
-        // Send proper JSON (without single quotes) to server
-        const res = await fetch("/wallet/SendTransaction", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(txRequest)  // correct JSON for the server
-        });
-
-        const data = await res.json();
-
-        if (data.error) {
-            console.error("Wallet returned error:", data.error);
-            resultDiv.innerHTML += `<p style="color:red;">Transaction failed: ${data.error}</p>`;
-        } else {
-            resultDiv.innerHTML += `<p style="color:green;">Transaction sent! TXID: ${data.result.txid.hex}</p>`;
-    rpc('wallet', 'GetBalance');
-    rpc('wallet', 'ListTransactions');
-        }
-
-    } catch (err) {
-        console.error("Fetch error:", err);
-        resultDiv.innerHTML += `<p style="color:red;">Error sending transaction: ${err.message}</p>`;
-    }
-});
-
-
-
-
-
-
-
-
-
-function showAddressQRCode(address) {
-    hide(['mnemonicContainer', 'create_wallet', 'walletName', 'confirmWalletCreation', 'result', 'feerate', 'btcAddress', 'scanButton', 'btc', 'amount', 'confirm', 'reader']);
-   
-
-
-
-    const wrapper = document.getElementById('qrcode-wrapper');
-wrapper.style.display = 'block';
-
-    wrapper.style.width = wrapper.style.height = '512px';
-   const addr = document.getElementById("address")
-   const qr = document.getElementById("qrcode")
-
-wrapper.style.visibility = 'visible';
-addr.innerHTML = address;
-qr.innerHTML = '';
-addr.style.visibility = 'visible';
-qr.style.visibility = 'visible';
-wrapper.style.marginTop = '-250px';
-//qr.style.marginTop = '-950px';
-
-addr.style.marginTop = '-550px';
-    new QRCode(document.getElementById("qrcode"), {
+      new QRCode(qrEl, {
         text: `bitcoin:${address}`,
         width: 512,
         height: 512,
-        colorDark: "#000000",
-        colorLight: "#ffffff",
+        colorDark: '#000000',
+        colorLight: '#ffffff',
         correctLevel: QRCode.CorrectLevel.H
-    })
-}
-
-
-
-
-function selectSidechain(name) {
-    const page = name.toLowerCase() + ".html";
-    window.location.href = page;
-}
-
-function getCurrentSidechain() {
-    let path = window.location.pathname;
-    let page = path.split("/").pop();   // e.g., thunder.html
-    page = page.replace(".html", "");   // thunder
-    return page.toLowerCase();
-}
-
-
-async function detectRunningSidechainsViaProxy() {
-    const sidechains = [
-        { name: "BitNames", proxy: "bitnames" },
-        { name: "BitAssets", proxy: "bitassets" },
-        { name: "Thunder", proxy: "thunder" },
-        { name: "Truthcoin-DC", proxy: "truthcoin-dc" },
-        { name: "ZSide", proxy: "zside" },
-        { name: "Photon", proxy: "photon" },
-        { name: "Coinshift", proxy: "coinshift" }
-    ];
-
-    const running = [];
-
-    for (const sc of sidechains) {
-        try {
-            const res = await fetch(`/${sc.proxy}/ping`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "ping" })
-            });
-
-            // Only skip if 404
-            if (res.status !== 404 && res.status !== 502) {
-                running.push(sc.name);
-            } else {
-                console.log(`${sc.name} backend returned 404, skipping`);
-            }
-
-        } catch (err) {
-            console.log(`${sc.name} backend not reachable`, err.message);
-        }
+      });
     }
 
-    return running; // array of names that are actually reachable
-}
+    // ── SHOW SIDECHAINS ──────────────────────────────────────────────────────
+    async function showSidechainsView() {
+      showView('sidechains');
+      const container = document.getElementById('view-sidechains');
+      container.innerHTML = `
+        <h3>CHOOSE A SIDECHAIN:</h3>
+        <p class="sidechain-checking">Checking available sidechains...</p>
+      `;
 
+      const current = getCurrentSidechain();
+      const running = await detectRunningSidechainsViaProxy();
 
-async function showSidechains() {
-    let resultDiv = document.getElementById("result");
-
-    // Hide other UI elements
-    hide([
-        'mnemonicContainer','create_wallet','walletName','confirmWalletCreation',
-        'btcAddress','feerate','scanButton','btc','amount','confirm',
-        'qrcode-wrapper','qrcode','address','reader'
-    ]);
-
-    // Optional: show a placeholder while detecting sidechains
-    resultDiv.innerHTML = '<h3 style="font-family: Consolas, monospace;">CHOOSE A SIDECHAIN:</h3><p style="color:#888; font-family: Consolas, monospace; font-size:40px;">Checking available sidechains...</p>';
-    resultDiv.style.visibility = 'visible';
-    resultDiv.style.fontSize = '50px';
-    resultDiv.style.marginTop = '-1250px';
-    resultDiv.style.textAlign = 'center';
-
-    const current = getCurrentSidechain(); // e.g., "thunder"
-    const running = await detectRunningSidechainsViaProxy();
-
-    // Build the list once we know which sidechains are running
-   let html = '<h3 style="font-family: Consolas, monospace;">CHOOSE A SIDECHAIN:</h3>';
-    html += '<ul class="sidechain-list" style="padding:0; font-family: \'Consolas, monospace\'; margin:20px auto; max-width:600px; text-align:center;">';
-
-    // Mainchain always first
-    html += `<li class="sidechain-item" onclick="window.location.href='index.html'">Mainchain</li>`;
-
-    // Add running sidechains except current
-    running.forEach(name => {
+      let html = '<h3>CHOOSE A SIDECHAIN:</h3><ul class="sidechain-list">';
+      html += `<li class="sidechain-item" onclick="window.location.href='index.html'">Mainchain</li>`;
+      running.forEach(name => {
         const lower = name.toLowerCase();
         if (lower !== current) {
-            html += `<li class="sidechain-item" onclick="window.location.href='${lower}.html'">${name}</li>`;
+          html += `<li class="sidechain-item" onclick="window.location.href='${lower}.html'">${name}</li>`;
         }
+      });
+      html += '</ul>';
+      container.innerHTML = html;
+    }
+
+    // ── SHOW SEND FORM ────────────────────────────────────────────────────────
+    document.getElementById('sendButton').addEventListener('click', () => {
+      showView('send');
+      document.getElementById('reader').classList.add('hidden');
+      document.getElementById('btcAddress').value = '';
+      document.getElementById('amount').value = '0';
+      document.getElementById('btcForm').style.display = 'block';
+
+      // Reset send form visibility
+      ['btcAddress', 'amount', 'scanButton', 'btc-label', 'confirm'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.visibility = 'visible';
+      });
     });
 
-    html += '</ul>';
-    resultDiv.innerHTML = html;
-
-    // Style the list nicely
-    const items = document.querySelectorAll('.sidechain-item');
-    items.forEach(item => {
-        item.style.fontSize = '48px';
-        item.style.padding = '20px';
-        item.style.margin = '10px auto';
-        item.style.cursor = 'pointer';
-        item.style.background = '#111';
-        item.style.fontFamily = 'Consolas, monospace';
-        item.style.color = 'white';
-        item.style.borderRadius = '12px';
-        item.style.transition = 'all 0.2s ease-in-out';
-        item.onmouseover = () => { item.style.background = '#333'; item.style.transform = 'scale(1.05)'; };
-        item.onmouseout = () => { item.style.background = '#111'; item.style.transform = 'scale(1)'; };
+    // ── RECEIVE BUTTON ────────────────────────────────────────────────────────
+    document.getElementById('receiveButton').addEventListener('click', () => {
+      rpc('wallet', 'CreateNewAddress');
     });
 
-    resultDiv.style.visibility = 'visible';
-}
+    // ── CONFIRM SEND ──────────────────────────────────────────────────────────
+    document.getElementById('confirm').addEventListener('click', async (e) => {
+      e.preventDefault();
 
+      const address   = document.getElementById('btcAddress').value.trim();
+      const amountBtc = parseFloat(document.getElementById('amount').value);
 
+      if (!isValidBitcoinAddress(address)) {
+        alert('Invalid Bitcoin, Testnet, or Signet address');
+        return;
+      }
+      if (isNaN(amountBtc) || amountBtc <= 0) {
+        alert('Enter a valid amount');
+        return;
+      }
 
+      const amountSats = Math.floor(amountBtc * 1e8);
+      const txRequest  = {
+        destinations: { [address]: amountSats },
+        feeRate: { sat_per_vbyte: 10 }
+      };
 
-// --------- Periodic Updates ---------
-function startTimers() {
-    rpc('wallet', 'GetBalance');
-    rpc('wallet', 'ListTransactions');
-    if (timer) clearInterval(timer);
-    timer = setInterval(() => {
-        rpc('wallet', 'GetBalance');
-       
-    }, 5000);
-}
+      showView('result');
+      const resultDiv = document.getElementById('view-result');
+      const singleQuotedJson = `'${JSON.stringify(txRequest, null, 2)}'`;
+      resultDiv.innerHTML = `<p>Sending ${amountBtc} BTC to ${address}...</p><pre>${singleQuotedJson}</pre>`;
 
-// --------- On Page Load ---------
-document.addEventListener('DOMContentLoaded', () => {
-    startTimers();
-});
-</script>
+      try {
+        const res  = await fetch('/wallet/SendTransaction', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(txRequest)
+        });
+        const data = await res.json();
 
-  </html>
+        if (data.error) {
+          resultDiv.innerHTML += `<p style="color:var(--color-accent-red);">Transaction failed: ${data.error}</p>`;
+        } else {
+          resultDiv.innerHTML += `<p style="color:var(--color-accent-green);">Transaction sent! TXID: ${data.result.txid.hex}</p>`;
+          rpc('wallet', 'GetBalance');
+          rpc('wallet', 'ListTransactions');
+        }
+      } catch (err) {
+        resultDiv.innerHTML += `<p style="color:var(--color-accent-red);">Error sending transaction: ${err.message}</p>`;
+      }
+    });
+
+    // ── QR SCANNER ────────────────────────────────────────────────────────────
+    let scanner = null;
+
+    document.getElementById('scanButton').addEventListener('click', async () => {
+      const reader = document.getElementById('reader');
+
+      // Hide send form elements so camera takes over
+      ['btcAddress', 'amount', 'scanButton', 'btc-label', 'confirm'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.visibility = 'hidden';
+      });
+
+      reader.classList.remove('hidden');
+      reader.style.visibility = 'visible';
+
+      if (!scanner) scanner = new Html5Qrcode('reader');
+
+      try {
+        await scanner.start(
+          { facingMode: 'environment' },
+          { fps: 10, qrbox: { width: 2000, height: 1000 } },
+          (decodedText) => {
+            handleScannedText(decodedText);
+            scanner.stop();
+            reader.classList.add('hidden');
+          },
+          () => {} // ignore scan errors
+        );
+      } catch (err) {
+        console.error('Camera start failed:', err);
+      }
+    });
+
+    function handleScannedText(text) {
+      let clean  = text.replace(/^[a-zA-Z]+:/, '');
+      let parts   = clean.split('?');
+      let address = parts[0];
+      let amount  = parts[1] ? new URLSearchParams(parts[1]).get('amount') : null;
+
+      if (isValidBitcoinAddress(address)) {
+        document.getElementById('btcAddress').value = address;
+        if (amount) document.getElementById('amount').value = amount;
+        // Restore send form elements after scan
+        ['btcAddress', 'amount', 'scanButton', 'btc-label', 'confirm'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.style.visibility = 'visible';
+        });
+      } else {
+        alert('Invalid Bitcoin, Testnet, or Signet address');
+      }
+    }
+
+    // ── HELPERS ───────────────────────────────────────────────────────────────
+    function isValidBitcoinAddress(address) {
+      return /^(bc1|tb1|sb1|[13])[a-zA-HJ-NP-Z0-9]{20,100}$/.test(address);
+    }
+
+    function btcToSats(btc) {
+      return Math.floor(btc * 1e8);
+    }
+
+    function getCurrentSidechain() {
+      let page = window.location.pathname.split('/').pop();
+      return page.replace('.html', '').toLowerCase();
+    }
+
+    async function detectRunningSidechainsViaProxy() {
+      const sidechains = [
+        { name: 'BitNames',    proxy: 'bitnames' },
+        { name: 'BitAssets',   proxy: 'bitassets' },
+        { name: 'Thunder',     proxy: 'thunder' },
+        { name: 'Truthcoin-DC',proxy: 'truthcoin-dc' },
+        { name: 'ZSide',       proxy: 'zside' },
+        { name: 'Photon',      proxy: 'photon' },
+        { name: 'Coinshift',   proxy: 'coinshift' }
+      ];
+
+      const running = [];
+      for (const sc of sidechains) {
+        try {
+          const res = await fetch(`/${sc.proxy}/ping`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'ping' })
+          });
+          if (res.status !== 404 && res.status !== 502) running.push(sc.name);
+        } catch (err) {
+          console.log(`${sc.name} backend not reachable`, err.message);
+        }
+      }
+      return running;
+    }
+
+    // ── TIMERS ────────────────────────────────────────────────────────────────
+    function startTimers() {
+      rpc('wallet', 'GetBalance');
+      rpc('wallet', 'ListTransactions');
+      if (timer) clearInterval(timer);
+      timer = setInterval(() => rpc('wallet', 'GetBalance'), 5000);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      startTimers();
+    });
+
+  </script>
+</html>

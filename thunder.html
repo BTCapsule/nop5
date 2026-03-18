@@ -1,1368 +1,1114 @@
-  <!DOCTYPE html>
-  <html>
-   <meta name="viewport" content="width=1000, maximum-scale=1, user-scalable=no">
-    <meta name="application-name" content="LayerTwoLabs">
-    <meta name="msapplication-TileColor" content="#ffffff">
-    <meta name="msapplication-TileImage" content="https://btcapsule.com/images/qrCode.png">
-    <meta name="theme-color" content="#000000">
-    <link rel="apple-touch-icon" href="https://btcapsule.com/images/qrCode.png" />
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <meta name="apple-mobile-web-app-title" content="Thunder">
-    <meta name="mobile-web-app-capable" content="yes">
-    <head>
-      <script src="https://unpkg.com/html5-qrcode"></script>
-    </head>
-    <style>
-      body {
-        color: white;
-        background: black;
-      }
+<!DOCTYPE html>
+<html>
+  <meta name="viewport" content="width=1000, maximum-scale=1, user-scalable=no">
+  <meta name="application-name" content="LayerTwoLabs">
+  <meta name="msapplication-TileColor" content="#ffffff">
+  <meta name="msapplication-TileImage" content="https://btcapsule.com/images/qrCode.png">
+  <meta name="theme-color" content="#000000">
+  <link rel="apple-touch-icon" href="https://btcapsule.com/images/qrCode.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Thunder">
+  <meta name="mobile-web-app-capable" content="yes">
+  <head>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+  </head>
 
-      h2 {
-        color: white;
-        font-size: 60px;
-        font-family: sans-serif;
-        margin-bottom: 20px;
-        margin-left: 40px;
-        top: 20px;
-      }
+  <style>
+    /* =============================================
+       DESIGN TOKENS
+    ============================================= */
+    :root {
+      --color-bg:           #000000;
+      --color-fg:           #ffffff;
+      --color-muted:        #888888;
+      --color-dim:          #333333;
+      --color-panel-bg:     #111111;
+      --color-code-bg:      #252526;
+      --color-accent-green: #4ec9b0;
+      --color-accent-red:   #ff6b6b;
+      --color-accent-blue:  #9cdcfe;
+      --color-accent-yellow:#ffcc66;
+      --color-border:       #ffffff;
 
-      button {
-        background-color: #ffffff;
-        color: black;
-        padding: 20px 25px;
-        text-align: center;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 24px;
-        margin: 10px;
-        
-      }
+      --font-ui:    sans-serif;
+      --font-mono:  Consolas, monospace;
 
-      th,
-      td {
-        padding: 15px;
-        text-align: left;
-      }
+      --fs-title:          60px;
+      --fs-balance:        100px;
+      --fs-body:           34px;
+      --fs-input:          32px;
+      --fs-amount:         80px;
+      --fs-btc:            60px;
+      --fs-btn:            24px;
+      --fs-confirm:        50px;
+      --fs-sidechain-item: 48px;
 
-      table,
-      th,
-      td {
-        border: 1px solid;
-      }
+      --btn-padding: 20px 25px;
+      --btn-margin:  10px;
+    }
 
-      th {
-        background-color: black;
-        color: white;
-      }
+    /* =============================================
+       RESET / BASE
+    ============================================= */
+    body {
+      color: var(--color-fg);
+      background: var(--color-bg);
+      margin: 0;
+      padding: 0;
+    }
 
-      tr:hover {
-        background-color: #D6EEEE;
-      }
+    h2 {
+      color: var(--color-fg);
+      font-size: var(--fs-title);
+      font-family: var(--font-ui);
+      margin-bottom: 20px;
+      margin-left: 40px;
+      margin-top: 20px;
+    }
 
-      tr:nth-child(even) {
-        background-color: black;
-        color: white;
-      }
+    li { list-style: none; }
 
-li {
-list-style: none
-}
+    /* =============================================
+       TABLES
+    ============================================= */
+    th, td { padding: 15px; text-align: left; }
+    table, th, td { border: 1px solid var(--color-border); }
+    th { background-color: var(--color-bg); color: var(--color-fg); }
+    tr:hover { background-color: #D6EEEE; }
+    tr:nth-child(even) { background-color: var(--color-bg); color: var(--color-fg); }
+    .center-table { margin-left: auto; margin-right: auto; }
 
-      .center-table {
-        margin-left: auto;
-        margin-right: auto;
-      }
+    /* =============================================
+       BUTTONS
+    ============================================= */
+    button {
+      background-color: var(--color-fg);
+      color: var(--color-bg);
+      padding: var(--btn-padding);
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: var(--fs-btn);
+      margin: var(--btn-margin);
+      cursor: pointer;
+      border: none;
+    }
 
-      #balance {
-        color: white;
-        font-size: 100px;
-        font-family: sans-serif;
-        text-align: center;
-        margin-top: 30px;
-      }
+    /* =============================================
+       LAYOUT: CHROME
+    ============================================= */
+    #balance {
+      color: var(--color-fg);
+      font-size: var(--fs-balance);
+      font-family: var(--font-ui);
+      text-align: center;
+      margin-top: 30px;
+    }
 
-      #center {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-top: 15px;
-        margin-bottom: 15px;
-      }
+    #button-container {
+      display: flex;
+      justify-content: center;
+    }
 
-      #qrcode {
-        text-align: center;
-        height: 0;
-position: absolute;
-      }
+    /* Fixed to viewport bottom */
+    #button-container2 {
+      position: fixed;
+      bottom: 20px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+    }
 
-      #qrcode-wrapper {
-position: absolute;
-        margin-top: 610px;
-        margin-right: 10px;
-        
-        background-color: white;
-        display: none;
-      }
+    /* =============================================
+       LAYOUT: MIDDLE PANEL
+    ============================================= */
+    #panel {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 400px;
+      padding-bottom: 120px;
+      margin-top: 15px;
+    }
 
-      #address {
-        color: white;
-        font-size: 36px;
-        font-family: sans-serif;
-        text-align: center;
-        margin-top: 200px;
-        margin-right: auto;
-position: absolute;
-        margin-left: auto;
-        justify-content: center;
-        bottom: 500px;
-        width: 600px;
-        display: flex;
-        word-wrap: break-word;
-      }
+    /* =============================================
+       VIEW: INFO / UTXOS  (#view-info)
+    ============================================= */
+    #view-info {
+      display: none;
+      font-family: var(--font-mono);
+      font-size: var(--fs-body);
+      color: #d4d4d4;
+      padding: 15px;
+      border-radius: 8px;
+      max-height: 60vh;
+      overflow-y: auto;
+      width: 100%;
+      max-width: 900px;
+    }
 
-      #transactions {
-        font-family: sans-serif;
-        font-size: 46px;
-      }
+    .tx-list  { list-style: none; padding: 0; margin: 0; }
+    .tx-item  { padding: 12px 0; border-bottom: 1px solid var(--color-dim); }
+    .tx-row   { display: flex; align-items: center; gap: 300px; }
+    .tx-id    { color: var(--color-accent-blue); font-weight: bold; }
+    .tx-amount-in      { color: var(--color-accent-green); font-weight: bold; }
+    .tx-amount-out     { color: var(--color-accent-red);   font-weight: bold; }
+    .tx-amount-unknown { color: var(--color-muted); }
+    .tx-empty { color: var(--color-accent-red); }
 
-      #sendForm {
-        position: absolute;
-        top: 400px;
-        margin-left: auto;
-        margin-right: auto;
-      }
+    /* =============================================
+       VIEW: RECEIVE / QR CODE  (#view-receive)
+    ============================================= */
+    #view-receive {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+    }
 
-      #button-container {
-        display: flex;
-        justify-content: center;
-        display:flex;
-      }
+    #qrcode-wrapper {
+      border: 10px solid var(--color-border);
+      padding: 10px;
+      background-color: var(--color-fg);
+      width: 512px;
+      height: 512px;
+    }
 
-      #button-container2 {
-        position: relative;
-        bottom: 80px;
-        left: 0;
-        right: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
+    #qrcode { text-align: center; }
 
-      #amount-container {
-        display: inline-block;
-      }
+    #address {
+      color: var(--color-fg);
+      font-size: var(--fs-input);
+      font-family: var(--font-ui);
+      text-align: center;
+      word-wrap: break-word;
+      max-width: 600px;
+    }
 
-      #amount,
-      #btc {
-        display: inline-block;
-        vertical-align: middle;
-      }
+    /* =============================================
+       VIEW: SEND FORM  (#view-send)
+    ============================================= */
+    #view-send {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+    }
 
-      #amount {
-        background-color: black;
-        color: white;
-        font-size: 80px;
-        width: 100px;
-        text-align: center;
-        margin-left: auto;
-        margin-right: auto;
-        border: none;
-        outline: none;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-      }
+    .amount-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
 
-      #btcAddress {
-        margin-top: 200px;
-        background-color: black;
-        color: white;
-        font-size: 32px;
-        width: 800px;
-        border: none;
-        outline: none;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-        margin-left: auto;
-        margin-right: auto;
-        text-align: center;
-        border-bottom: 1px solid white;
-      }
+    #amount {
+      background-color: var(--color-bg);
+      color: var(--color-fg);
+      font-size: var(--fs-amount);
+      width: 200px;
+      text-align: center;
+      border: none;
+      outline: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+    }
 
+    #btc-label {
+      font-size: var(--fs-btc);
+      font-family: var(--font-mono);
+      color: var(--color-fg);
+    }
 
+    #btcAddress {
+      background-color: var(--color-bg);
+      color: var(--color-fg);
+      font-size: var(--fs-input);
+      width: 800px;
+      border: none;
+      outline: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      text-align: center;
+      border-bottom: 1px solid var(--color-fg);
+      margin-top: 30px;
+    }
 
-      #walletName {
-        margin-top: 200px;
-        background-color: black;
-        color: white;
-        font-size: 32px;
-        width: 800px;
-        border: none;
-        outline: none;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-        margin-left: auto;
-        margin-right: auto;
-        text-align: center;
-        border-bottom: 1px solid white;
-      }
+    #feerate {
+      color: var(--color-fg);
+      font-size: var(--fs-input);
+      font-family: var(--font-ui);
+      text-align: center;
+      word-wrap: break-word;
+      margin-top: 10px;
+    }
 
+    #confirm {
+      display: block;
+      margin: 40px auto 0;
+      font-size: var(--fs-confirm);
+      color: var(--color-bg);
+    }
 
-      #feerate {
-        color: white;
-        font-size: 36px;
-        font-family: sans-serif;
-        text-align: center;
-       
-        margin-right: auto;
+    #reader {
+      width: 700px;
+      height: 500px;
+    }
 
-        margin-left: auto;
-        justify-content: center;
-        word-wrap: break-word;
-      }
+    /* =============================================
+       VIEW: DEPOSIT  (#view-deposit)
+    ============================================= */
+    #view-deposit {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      font-family: var(--font-mono);
+    }
 
+    .deposit-card {
+      padding: 20px 25px;
+      border-radius: 12px;
+      max-width: 700px;
+      margin: 30px auto;
+      text-align: center;
+      color: #d4d4d4;
+      box-shadow: 0 0 10px var(--color-accent-green);
+    }
 
-      #html5-qrcode-button-camera-stop {
-        visibility: hidden;
-      }
-    
+    .deposit-title {
+      color: var(--color-accent-green);
+      margin-bottom: 15px;
+      font-size: var(--fs-body);
+    }
 
-     
-	.word {
-	 font-family: sans-serif;
-	 font-size: 48px;
-	 color: black;
-	 background-color: white;
-	 margin: 10px;
-	 padding: 10px;
-	}
-	   
-#popup {
- position: absolute;
- 
- width: 400px;
- height: 900px;
- /*overflow: auto;*/
- background-color: white;
-margin-top: -400px;
-}
+    .deposit-address {
+      font-size: 28px;
+      word-break: break-all;
+      background: var(--color-code-bg);
+      padding: 15px;
+      border-radius: 8px;
+      display: inline-block;
+      color: var(--color-accent-blue);
+      cursor: pointer;
+      user-select: all;
+    }
 
-#reader {
-    
-    top: 120px;
-    left: 225px;
-    transform: translateX(-50%);
-    width: 1000px;
-    
-    height: 600px;
-    
-}
+    .deposit-copy-feedback {
+      color: var(--color-accent-green);
+      margin-top: 10px;
+      font-size: 16px;
+      display: none;
+    }
 
+    .deposit-amount-row { margin-top: 40px; }
 
-#reader video {
-    width: 500% !important;
-    height: 100% !important;
-    object-fit: cover;
-}
-.popup-content {
- background-color: red;
- margin: 15% auto;
- padding: 20px;
- border: 1px solid #888;
- width: 80%;
-}
+    .deposit-amount-input {
+      background: var(--color-bg);
+      color: var(--color-fg);
+      font-size: 60px;
+      width: 220px;
+      border: none;
+      border-bottom: 1px solid var(--color-fg);
+      text-align: center;
+      outline: none;
+    }
 
-#dawg {
-Background-color:black;
-height: 500px;
-} 
+    .deposit-btc-label {
+      font-size: 50px;
+      font-family: var(--font-mono);
+    }
 
-.sidechain-list {
-  list-style-type: none;
-  padding-left: 0;
-list-style: none;
-}
+    .deposit-submit-btn {
+      display: block;
+      margin: 40px auto 0;
+      font-size: 42px;
+      padding: 18px 40px;
+    }
 
-.sidechain-list li {
-  margin-bottom: 10px;
-  cursor: pointer;
-list-style: none;
+    /* =============================================
+       VIEW: SIDECHAINS  (#view-sidechains)
+    ============================================= */
+    #view-sidechains {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 50px;
+      text-align: center;
+    }
 
-}
+    .sidechain-list {
+      list-style: none;
+      padding: 0;
+      margin: 20px auto;
+      max-width: 600px;
+      text-align: center;
+    }
 
-.sidechain-list li:hover {
-  text-decoration: underline;
+    .sidechain-item {
+      font-size: var(--fs-sidechain-item);
+      padding: 20px;
+      margin: 10px auto;
+      cursor: pointer;
+      background: var(--color-panel-bg);
+      font-family: var(--font-mono);
+      color: var(--color-fg);
+      border-radius: 12px;
+      transition: background 0.2s ease-in-out, transform 0.2s ease-in-out;
+    }
 
-}
+    .sidechain-item:hover {
+      background: var(--color-dim);
+      transform: scale(1.05);
+    }
 
-.sidechain-input {
-  background-color: black;
-  color: white;
-  font-size: 32px;
-  width: 800px;
-  border: none;
-  outline: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  margin-left: auto;
-  margin-right: auto;
-  text-align: center;
-  border-bottom: 1px solid white;
-  margin-top: 20px;
-  display: block;
-}
+    .sidechain-checking {
+      color: var(--color-muted);
+      font-family: var(--font-mono);
+      font-size: 40px;
+    }
 
-.sidechain-button {
-  background-color: #ffffff;
-  color: black;
-  padding: 20px 25px;
-  text-align: center;
-  text-decoration: none;
-  display: block;
-  font-size: 24px;
-  margin: 20px auto;
-  
-  margin-bottom: 400px;
-}
+    /* =============================================
+       VIEW: RESULT  (#view-result)
+    ============================================= */
+    #view-result {
+      display: none;
+      font-family: var(--font-mono);
+      font-size: var(--fs-body);
+      color: #d4d4d4;
+      padding: 15px;
+      border-radius: 8px;
+      max-height: 60vh;
+      overflow-y: auto;
+      width: 100%;
+      max-width: 900px;
+      text-align: center;
+    }
 
-    </style>
-    <body>
-     
-      <h2 class="exclude">Thunder</h2>
-      <br>
-      <br>
-      <div id="button-container" class="exclude">
-          <button id="displayBalance" onclick="thunderRPC('balance')">balance</button>
-        <button onclick="thunderRPC('get_wallet_utxos')">info</button>
-        <button onclick="showDeposit()">deposit</button>
-	<button onclick="runRPC('validator', 'GetSidechains')">sidechains</button>
-	</div>
+    /* =============================================
+       UNCONFIRMED BALANCE PILL
+    ============================================= */
+    .unconfirmed-pill {
+      margin: 15px auto;
+      padding: 12px 18px;
+      border-radius: 10px;
+      background: #1e1e1e;
+      color: var(--color-accent-yellow);
+      font-family: var(--font-ui);
+      font-size: 21px;
+      display: block;
+      width: fit-content;
+      text-align: center;
+      box-shadow: 0 0 8px rgba(255, 204, 102, 0.4);
+    }
 
-      <div id="balance"></div>
-      <br>
-      <br>
-      <div id="center">
- <div id="reader" style="display:none; margin:auto;"></div>
+    /* =============================================
+       WALLET / MNEMONIC
+    ============================================= */
+    #view-create-wallet {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
 
-	<div id="create_wallet" style="visibility: hidden; text-align: right;">
+    #walletName {
+      background-color: var(--color-bg);
+      color: var(--color-fg);
+      font-size: var(--fs-input);
+      width: 800px;
+      border: none;
+      outline: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      text-align: center;
+      border-bottom: 1px solid var(--color-fg);
+    }
 
-	 <input type="text" id="walletName" placeholder="Enter wallet name">
-	 <br><br>
-	 <button id="confirmWalletCreation">NEXT</button>
-	</div>
-</div>
+    #view-mnemonic {
+      display: none;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
 
-<div id="center">
-        <div id="mnemonicContainer">
-        </div>
+    .word {
+      font-family: var(--font-ui);
+      font-size: 48px;
+      color: var(--color-bg);
+      background-color: var(--color-fg);
+      margin: 10px;
+      padding: 10px;
+    }
+
+    .sidechain-input {
+      background-color: var(--color-bg);
+      color: var(--color-fg);
+      font-size: var(--fs-input);
+      width: 800px;
+      border: none;
+      outline: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: center;
+      border-bottom: 1px solid var(--color-fg);
+      margin-top: 20px;
+      display: block;
+    }
+
+    .sidechain-button {
+      background-color: var(--color-fg);
+      color: var(--color-bg);
+      padding: var(--btn-padding);
+      text-align: center;
+      display: block;
+      font-size: var(--fs-btn);
+      margin: 20px auto;
+    }
+
+    /* =============================================
+       UTILITY
+    ============================================= */
+    .hidden { display: none !important; }
+
+    #html5-qrcode-button-camera-stop { display: none; }
+
+    #popup {
+      position: absolute;
+      width: 400px;
+      height: 900px;
+      background-color: var(--color-fg);
+    }
+
+    #dawg {
+      background-color: var(--color-bg);
+      height: 500px;
+    }
+
+    #transactions {
+      font-family: var(--font-ui);
+      font-size: 46px;
+    }
+
+  </style>
+
+  <body>
+
+    <!-- ── HEADER ─────────────────────────────── -->
+    <h2 class="exclude">Thunder</h2>
+    <br><br>
+
+    <!-- ── TOP NAV BUTTONS ───────────────────── -->
+    <div id="button-container" class="exclude">
+      <button id="displayBalance" onclick="thunderRPC('balance')">balance</button>
+      <button onclick="thunderRPC('get_wallet_utxos')">info</button>
+      <button onclick="showDeposit()">deposit</button>
+      <button onclick="runRPC('validator', 'GetSidechains')">sidechains</button>
+    </div>
+
+    <!-- ── BALANCE ────────────────────────────── -->
+    <div id="balance"></div>
+    <br><br>
+
+    <!-- ══════════════════════════════════════════
+         MIDDLE PANEL
+    ═══════════════════════════════════════════ -->
+    <div id="panel">
+
+      <!-- VIEW: INFO / UTXOS -->
+      <div id="view-info">
+        <!-- populated by showInfo() -->
       </div>
 
-
-
-
-
-<div id="center">
-        <div id="qrcode-wrapper" style="border: 10px solid white; display: none; padding: 10px;">
+      <!-- VIEW: RECEIVE -->
+      <div id="view-receive">
+        <div id="qrcode-wrapper">
           <div id="qrcode"></div>
         </div>
+        <div id="address"></div>
       </div>
 
-      <br>
-      <br>
-      <div id="center">
-        <div id="transactions"></div>
-      </div>
-      <br>
-      <br>
-      <br>
-      <div id="center-results" style="display: flex; margin-top: 400px; justify-content: center; align-items: center;">
-        <p id="result" style="justify-content:center; align-items:center; text-align: center;"></p>
- <div id="address"></div>
-      </div>
-       
-      
-      <div id="button-container2" class="exclude">
-        <button class="exclude" onclick="thunderRPC('get_new_address'); setTimeout(function() {document.getElementById('qrcode-wrapper').style.display = 'inline-block';}, 500)"> RECEIVE</button>
-        <button style="width:155px;" id="sendButton" class="exclude">SEND</button> 
-      </div>
-      <br>
-      <br>
+      <!-- VIEW: SEND -->
+      <div id="view-send">
+        <div id="reader" class="hidden"></div>
 
-      <br>
-      <div id="center">
-        <div id="sendForm" style="display: none; margin-top: 50px;">
-          <form id="btcForm" style="margin-left: auto; margin-right: auto; text-align: center;">
-            <label for="amount"></label>
-            <br>
-            <div id="amount-container">
-              <input type="number" id="amount" name="amount" min="0" value="0" maxlength="15" style="display: inline-block; vertical-align: middle;">
-              <p id="btc" style="display: inline-block; vertical-align: middle; font-size: 60px; font-family: monospace;"> BTC</p>
-              <br>
-              <br>
-              <button id="scanButton" class="exclude" type="button">SCAN</button>
-            </div>
-            <label for="btcAddress"></label>
-            <br>
-            <input type="text" id="btcAddress" name="btcAddress" placeholder="Enter Address">
-            <br><br>
-               <p id="feerate"></p>            
-            <button id="confirm" style="display: block; margin: auto; text-align: center; font-size:50px; margin-top: 110px; color: black;">CONFIRM</button>
-          </form>
-
+        <div id="btcForm">
+          <div class="amount-row">
+            <input type="number" id="amount" name="amount" min="0" value="0" maxlength="15">
+            <span id="btc-label">BTC</span>
+          </div>
+          <br><br>
+          <button id="scanButton" class="exclude" type="button">SCAN</button>
+          <br>
+          <input type="text" id="btcAddress" name="btcAddress" placeholder="Enter Address">
+          <br><br>
+          <p id="feerate"></p>
+          <button id="confirm">CONFIRM</button>
         </div>
       </div>
-      <br>
-        <br>
-        <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
-<script>
-let timer = null;
 
-let confirmedBalance = 0;
-let pendingSpend = 0;
-let unconfirmedBalance = null;
+      <!-- VIEW: DEPOSIT -->
+      <div id="view-deposit">
+        <!-- populated by showDeposit() -->
+      </div>
 
-// restore pending state if it exists
-const savedPending = localStorage.getItem("pendingSpend");
-const savedUnconfirmed = localStorage.getItem("unconfirmedBalance");
+      <!-- VIEW: SIDECHAINS -->
+      <div id="view-sidechains">
+        <!-- populated by showSidechainsView() -->
+      </div>
 
-if (savedPending) pendingSpend = parseInt(savedPending);
-if (savedUnconfirmed) unconfirmedBalance = parseInt(savedUnconfirmed);
+      <!-- VIEW: CREATE WALLET -->
+      <div id="view-create-wallet">
+        <input type="text" id="walletName" placeholder="Enter wallet name">
+        <br><br>
+        <button id="confirmWalletCreation">NEXT</button>
+      </div>
 
-// --------- Utility Functions ---------
-function showDivs(divIds) {
-    let divs = document.getElementsByTagName('div');
+      <!-- VIEW: MNEMONIC -->
+      <div id="view-mnemonic">
+        <!-- populated dynamically -->
+      </div>
 
-    for (let div of divs) {
-        if (!div.classList.contains('exclude')) {
-            div.style.visibility = 'hidden';
-            div.style.height = "0px";
-        }
+      <!-- VIEW: GENERIC RESULT -->
+      <div id="view-result">
+        <!-- send confirmations, errors, etc. -->
+      </div>
+
+    </div><!-- /#panel -->
+
+    <!-- ── BOTTOM FIXED NAV ───────────────────── -->
+    <div id="button-container2" class="exclude">
+      <button class="exclude" id="receiveButton">RECEIVE</button>
+      <button style="width:155px;" id="sendButton" class="exclude">SEND</button>
+    </div>
+
+  </body>
+
+  <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+  <script>
+
+    let timer = null;
+    let confirmedBalance = 0;
+    let pendingSpend = 0;
+    let unconfirmedBalance = null;
+
+    // Restore pending state from localStorage
+    const savedPending = localStorage.getItem('pendingSpend');
+    const savedUnconfirmed = localStorage.getItem('unconfirmedBalance');
+    if (savedPending) pendingSpend = parseInt(savedPending);
+    if (savedUnconfirmed) unconfirmedBalance = parseInt(savedUnconfirmed);
+
+    let autoShowQRCode = true;
+
+    // ── VIEW MANAGER ────────────────────────────────────────────────────────
+    const ALL_VIEWS = [
+      'view-info',
+      'view-receive',
+      'view-send',
+      'view-deposit',
+      'view-sidechains',
+      'view-create-wallet',
+      'view-mnemonic',
+      'view-result',
+    ];
+
+    function showView(name) {
+      ALL_VIEWS.forEach(id => {
+        document.getElementById(id).style.display = 'none';
+      });
+      const el = document.getElementById('view-' + name);
+      if (el) {
+        const flexViews = ['receive', 'send', 'deposit', 'sidechains', 'create-wallet', 'mnemonic'];
+        el.style.display = flexViews.includes(name) ? 'flex' : 'block';
+      }
     }
 
-    for (let id of divIds) {
-        let elem = document.getElementById(id);
-        if (elem) {
-            elem.style.visibility = 'visible';
-            elem.style.height = "auto";   // ← restore height
-        }
-    }
-}
-
-
-
-
-
-
-
-
-
-async function runRPC(category, method, args = []) {
-    const data = await callRPC(category, method, args);
-    console.log(category, method, data);
-    if (method === 'GetSidechains') { showSidechains(data.result); console.log(data.result); }
-     if (method === 'GetChainInfo') { showInfo(data.result); console.log(data.result); }
-}
-
-function showInfo(info) {
-    // Get the result div and clear it
-    let resultDiv = document.getElementById("result");
-    resultDiv.innerHTML = '';
-
-    // Hide other UI elements
-    hide([
-        'mnemonicContainer', 'create_wallet', 'walletName', 'confirmWalletCreation',
-        'btcAddress', 'feerate', 'scanButton', 'btc', 'amount', 'confirm',
-        'qrcode-wrapper', 'qrcode', 'address'
-    ]);
-
-    // Create container div with same styles
-    const container = document.createElement('div');
-    container.style.padding = '15px';
-    container.style.borderRadius = '8px';
-    container.style.marginTop = '15px';
-    container.style.fontFamily = 'Consolas, monospace';
-    container.style.fontSize = '34px';
-    container.style.color = '#d4d4d4';
-    container.style.maxHeight = '60vh';
-    container.style.overflowY = 'auto';
-
-    // Check if we have transactions
-    if (!info || !Array.isArray(info) || info.length === 0) {
-        container.innerHTML = '<p style="color:#ff6b6b;">No transactions found.</p>';
-        resultDiv.appendChild(container);
-        resultDiv.style.visibility = 'visible';
-        resultDiv.style.marginTop = '-1250px';
-        return;
+    // ── UNCONFIRMED BALANCE PILL ─────────────────────────────────────────────
+    function renderUnconfirmedPill(btcAmount) {
+      return `<div class="unconfirmed-pill">Unconfirmed balance: <strong>${btcAmount} BTC</strong></div>`;
     }
 
-    // Optional: sort by txid (or add custom sorting if needed)
-    const recentTxs = info.slice(0, 5); // take only the first 5 items
-
-    // Build list
-    const ul = document.createElement('ul');
-    ul.style.listStyle = 'none';
-    ul.style.padding = '0';
-    ul.style.margin = '0';
-
-    recentTxs.forEach(tx => {
-        const li = document.createElement('li');
-        li.style.padding = '12px 0';
-        li.style.borderBottom = '1px solid #333';
-
-        // Get short txid
-        const txid = tx?.outpoint?.Regular?.txid || '??????';
-        const shortTxid = txid.substring(0, 6);
-
-        // Get value in sats and convert to BTC
-        const sats = tx?.output?.content?.Value || 0;
-        const btc = (sats / 1e8).toFixed(8);
-
-        // Amount display (incoming, always green here)
-        const amountDisplay = `<span style="color:#4ec9b0; font-weight:bold;">+${btc} BTC</span>`;
-
-        // Build row exactly like old layout
-        li.innerHTML = `
-            <div style="display:flex; align-items:center; gap:300px;">
-                <div>
-                    <span style="color:#9cdcfe; font-weight:bold;">${shortTxid}...</span>
-                </div>
-                <div style="text-align:right;">
-                    ${amountDisplay}
-                </div>
-            </div>
-        `;
-
-        ul.appendChild(li);
-    });
-
-    container.appendChild(ul);
-
-    resultDiv.appendChild(container);
-
-    resultDiv.style.visibility = 'visible';
-    resultDiv.style.marginTop = '-1250px';
-    resultDiv.style.fontSize = '16px';
-}
-
-
-
-
-
-async function showDeposit() {
-
-    const resultDiv = document.getElementById("result");
-    resultDiv.innerHTML = '';
-
-    // Hide everything unrelated
-    hide([
-        'mnemonicContainer','create_wallet','walletName','confirmWalletCreation',
-        'btcAddress','feerate','scanButton','confirm',
-        'qrcode-wrapper','qrcode','address', 'amount', 'btc'
-    ]);
-
-    autoShowQRCode = false;
-
-    try {
-
-        // -------- GET RAW ADDRESS --------
-        const newAddrData = await thunderRPC('get_new_address');
-        const rawAddress = newAddrData?.result;
-
-        if (!rawAddress || typeof rawAddress !== 'string') {
-            resultDiv.innerHTML = `<p style="color:#ff6b6b; font-size:18px;">Failed to get deposit address</p>`;
-            resultDiv.style.visibility = 'visible';
-            return;
-        }
-
-        // -------- FORMAT ADDRESS FOR DISPLAY --------
-        const formattedData = await thunderRPC('format_deposit_address', [rawAddress]);
-        const displayAddress = formattedData?.result || rawAddress;
-
-        // -------- SHOW ADDRESS UI --------
-        resultDiv.innerHTML = `
-        <div style="
-            padding:20px 25px;
-            border-radius:12px;
-            max-width:700px;
-            margin:30px auto;
-            text-align:center;
-            font-family:'Consolas', monospace;
-            color:#d4d4d4;
-            box-shadow:0 0 10px #4ec9b0;
-        ">
-            <h3 style="color:#4ec9b0; margin-bottom:15px; font-size:34px;">Deposit Address</h3>
-
-            <p id="depositAddress" style="
-                font-size:28px;
-                word-break:break-all;
-                background:#252526;
-                padding:15px;
-                border-radius:8px;
-                display:inline-block;
-                color:#9cdcfe;
-                cursor:pointer;
-                user-select:all;
-            ">${displayAddress}</p>
-
-            <div id="copyFeedback" style="color:#4ec9b0; margin-top:10px; font-size:16px; display:none;">
-                Copied!
-            </div>
-
-            <div style="margin-top:40px;">
-                <input type="number" id="depositAmount" placeholder="0.00"
-                style="
-                    background:black;
-                    color:white;
-                    font-size:60px;
-                    width:220px;
-                    border:none;
-                    border-bottom:1px solid white;
-                    text-align:center;
-                ">
-                <span style="font-size:50px; font-family:monospace;"> BTC</span>
-            </div>
-
-            <button id="depositButton"
-            style="
-                display:block;
-                margin:40px auto 0 auto;
-                font-size:42px;
-                padding:18px 40px;
-            ">
-            DEPOSIT
-            </button>
-
-        </div>
-        `;
-
-        // -------- COPY ADDRESS --------
-        const addressEl = document.getElementById("depositAddress");
-        const feedbackEl = document.getElementById("copyFeedback");
-
-        addressEl.addEventListener("click", async () => {
-            try {
-                await navigator.clipboard.writeText(displayAddress);
-                feedbackEl.style.display = "block";
-                setTimeout(() => feedbackEl.style.display = "none", 1500);
-            } catch(err) {
-                console.error(err);
-            }
-        });
-
-        // -------- DEPOSIT BUTTON --------
-        document.getElementById("depositButton").addEventListener("click", async function () {
-
-            const amountBtc = parseFloat(document.getElementById("depositAmount").value);
-
-            if (isNaN(amountBtc) || amountBtc <= 0) {
-                alert("Enter a valid amount");
-                return;
-            }
-
-            const valueSats = btcToSats(amountBtc);
-            const feeSats = 2000;
-
-            resultDiv.innerHTML += `<p style="margin-top:20px;">Creating deposit...</p>`;
-
-            // Prevent double-click deposits
-            this.disabled = true;
-
-            try {
-
-                const response = await thunderRPC("create_deposit", [
-                    rawAddress,   // IMPORTANT: raw address here
-                    valueSats,
-                    feeSats
-                ]);
-
-                if (response?.error) {
-                    resultDiv.innerHTML += `<p style="color:red;">Deposit failed</p>`;
-                    this.disabled = false;
-                    return;
-                }
-
-                resultDiv.innerHTML += `
-                <p style="color:#4ec9b0; font-size:20px;">
-                Deposit transaction created
-                </p>`;
-
-                thunderRPC("balance");
-                thunderRPC("get_wallet_utxos");
-
-            } catch(err) {
-
-                console.error(err);
-
-                resultDiv.innerHTML += `<p style="color:red;">Error creating deposit</p>`;
-
-                this.disabled = false;
-            }
-
-        });
-
-        resultDiv.style.visibility = 'visible';
-        resultDiv.style.marginTop = '-1250px';
-
-    } catch(err) {
-
-        console.error("showDeposit error:", err);
-
-        resultDiv.innerHTML = `<p style="color:#ff6b6b; font-size:18px;">Error fetching deposit address</p>`;
-        resultDiv.style.visibility = 'visible';
-
-    } finally {
-
-        autoShowQRCode = true;
-
-    }
-
-}
-
-
-
-
-
-
-function hide(elementIds) {
-    for (let id of elementIds) {
-        let elem = document.getElementById(id);
-        if (elem) elem.style.visibility = 'hidden';
-    }
-}
-
-// Validate Bitcoin, Testnet, or Signet addresses
-function isValidThunderAddress(address) {
-    // Matches: bc1/tb1/sb1 (segwit) or 1/3 legacy addresses
-    return /^[1-9A-HJ-NP-Za-km-z]{25,32}$/.test(address);
-}
-
-
-
-let scanner = null;
-
-document.getElementById("scanButton").addEventListener("click", async () => {
-
-    const reader = document.getElementById("reader");
-
-    // Hide form elements so camera takes over
-    hide(['btcAddress', 'amount', 'scanButton', 'btc', 'confirm']);
-
-    reader.style.display = "block";
-reader.style.visibility = "visible";
-
-    if (!scanner) {
-        scanner = new Html5Qrcode("reader");
-    }
-
-    try {
-        await scanner.start(
-            { facingMode: "environment" },
-            { fps: 10, qrbox: { width: 2000, height: 1000 } },
-            (decodedText) => {
-                console.log("QR RESULT:", decodedText);
-
-                handleScannedText(decodedText);
-
-                scanner.stop();
-                reader.style.display = "none";
-
-                // Restore UI
-               // showDivs(['btcAddress', 'amount', 'scanButton', 'btc', 'confirm']);
-            },
-            (errorMessage) => {
-                // ignore scan errors
-            }
-        );
-
-    } catch (err) {
-        console.error("Camera start failed:", err);
-       // showDivs(['btcAddress', 'amount', 'scanButton', 'btc', 'confirm']);
-    }
-
-});
-
-
-function handleScannedText(text) {
-    // Remove bitcoin: / lightning: / etc prefixes
-    let clean = text.replace(/^[a-zA-Z]+:/, "").trim();
-
-    // Split off query params (bitcoin:addr?amount=0.1&label=...)
-    let parts = clean.split("?");
-    let address = parts[0].trim();
-
-    let amount = null;
-    if (parts[1]) {
-        const params = new URLSearchParams(parts[1]);
-        amount = params.get("amount");  // in BTC
-    }
-
-    // Validate with new function
-    if (isValidThunderAddress(address)) {   // ← or isValidAddress if dual support
-        document.getElementById("btcAddress").value = address;
-        if (amount) {
-            document.getElementById("amount").value = amount;
-        }
-        // Optional: auto-focus amount or confirm
-    } else {
-        alert("Invalid address (expected 25–32 character mainchain address)");
-    }
-}
-
-
-document.getElementById("sendButton").addEventListener("click", () => {
-
-hide(['mnemonicContainer', 'create_wallet', 'walletName', 'confirmWalletCreation', 'result', 'feerate', 'qrcode', 'address', 'qrcode-wrapper']);
-
-const amt = document.getElementById("amount");
-amt.style.display = "none";
-amt.offsetHeight;
-amt.style.display = "inline-block";
-    document.getElementById("sendForm").style.display = "block";
-
-    document.getElementById("reader").style.display = "none";
-
-    document.getElementById("btcAddress").value = "";
-    document.getElementById("amount").value = "0";
-
-    // restore hidden elements
-
-document.getElementById("btcForm").style.display = "block";
-    document.getElementById("btcAddress").style.visibility = "visible";
-    document.getElementById("amount").style.visibility = "visible";
-    document.getElementById("scanButton").style.visibility = "visible";
-    document.getElementById("btc").style.visibility = "visible";
-    document.getElementById("confirm").style.visibility = "visible";
-
-});
-
-
-function btcToSats(btc) {
-    return Math.floor(btc * 1e8); // converts BTC to satoshis
-}
-
-
-
-
-document.getElementById("confirm").addEventListener("click", async (e) => {
-    e.preventDefault();
-
-    const resultDiv = document.getElementById("result");
-    const confirmBtn = document.getElementById("confirm");
-    const balanceEl = document.getElementById("balance");
-
-    resultDiv.style.visibility = "visible";
-    resultDiv.innerHTML = "";
-
-    // Prevent sending if balance already locked
- // Prevent sending if a transaction is pending
-if (unconfirmedBalance !== null) {
-    alert("Transaction already pending confirmation");
-    return;
-}
-
-    const address = document.getElementById("btcAddress").value.trim();
-    const amountBtc = parseFloat(document.getElementById("amount").value);
-
-    if (!isValidThunderAddress(address)) {
-        alert("Invalid mainchain address (25–32 characters expected)");
-        return;
-    }
-
-    if (isNaN(amountBtc) || amountBtc <= 0) {
-        alert("Enter a valid amount greater than 0");
-        return;
-    }
-
-    const valueSats = btcToSats(amountBtc);
-    const feeSats = 2000;
-
-    const totalSpend = valueSats + feeSats;
-
-    if (totalSpend > confirmedBalance) {
-        alert("Not enough funds for amount + fee");
-        return;
-    }
-
-    resultDiv.innerHTML = `<p>Sending transaction...</p>`;
-
-    try {
-
-        const params = [address, valueSats, feeSats];
-
-        const response = await thunderRPC("transfer", params);
-
-        if (response?.error) {
-            resultDiv.innerHTML = `<p style="color:red;">Transfer failed: ${response.error.message || JSON.stringify(response.error)}</p>`;
-            return;
-        }
-
-        const txid = response?.result?.txid || response?.result?.tx_hash || "unknown";
-
-        resultDiv.innerHTML = `<p style="color:#4ec9b0;">Transaction broadcast.</p>`;
-
-        // ----- LOCK UI BALANCE -----
-
-const newUnconfirmedBalance = confirmedBalance - totalSpend;
-
-unconfirmedBalance = newUnconfirmedBalance;
-pendingSpend = totalSpend;
-
-localStorage.setItem("pendingSpend", pendingSpend);
-localStorage.setItem("unconfirmedBalance", unconfirmedBalance);
-
-        // show zero confirmed balance
-        balanceEl.innerHTML = "0 BTC";
-
-        // disable confirm button
-     //   confirmBtn.disabled = true;
-
-        // create/update unconfirmed element
-        let unconfirmedEl = document.getElementById("unconfirmedBalance");
-
-        if (!unconfirmedEl) {
-            unconfirmedEl = document.createElement("div");
-            unconfirmedEl.id = "unconfirmedBalance";
-            unconfirmedEl.style.marginTop = "6px";
-            unconfirmedEl.style.fontSize = "14px";
-            unconfirmedEl.style.color = "#888";
-
-            balanceEl.after(unconfirmedEl);
-        }
-
-        const btc = (newUnconfirmedBalance / 1e8).toFixed(8).replace(/\.?0+$/, '');
-
-unconfirmedEl.innerHTML = `
-<div style="
-    margin:15px auto;
-    padding:12px 18px;
-    border-radius:10px;
-    background:#1e1e1e;
-    color:#ffcc66;
-    font-family:sans-serif;
-    font-size:21px;
-    display:block;
-    width:fit-content;
-    text-align:center;
-    box-shadow:0 0 8px rgba(255,204,102,0.4);
-">
-Unconfirmed balance: <strong>${btc} BTC</strong>
-</div>
-`;
-        // refresh wallet data
-        thunderRPC("balance");
-        thunderRPC("get_wallet_utxos");
-
-    } catch (err) {
-
-        console.error("Transfer error:", err);
-
-        resultDiv.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
-
-    }
-});
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-let autoShowQRCode = true; // default true
-
-
-
-
-
-// --------- RPC Call Wrapper ---------
-async function callRPC(category, method, args = []) {
-    try {
+    // ── RPC WRAPPERS ─────────────────────────────────────────────────────────
+    async function callRPC(category, method, args = []) {
+      try {
         const body = args.length ? { args } : undefined;
         const res = await fetch(`/${category}/${method}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: body ? JSON.stringify(body) : undefined
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: body ? JSON.stringify(body) : undefined
         });
         return await res.json();
-    } catch (err) {
+      } catch (err) {
         console.error(`RPC Error: ${category}/${method}`, err);
         return { error: err.toString() };
+      }
     }
-}
 
-// --------- Wallet & Transaction Functions ---------
-async function thunderRPC(method, params = []) {
-    try {
-        // Build the exact JSON-RPC payload
+    async function runRPC(category, method, args = []) {
+      const data = await callRPC(category, method, args);
+      console.log(category, method, data);
+      if (method === 'GetSidechains') { showSidechainsView(); console.log(data.result); }
+      if (method === 'GetChainInfo')  { showInfo(data.result); console.log(data.result); }
+    }
+
+    async function thunderRPC(method, params = []) {
+      try {
         const payload = {
-            jsonrpc: "2.0",
-            id: 1,
-            method,
-            params: params.length ? params : undefined  // omit "params" if empty
+          jsonrpc: '2.0',
+          id: 1,
+          method,
+          params: params.length ? params : undefined
         };
 
-        // ── DEBUG: Show exactly what is being sent ──
         console.log(`thunderRPC → sending to /thunder/${method}:`);
         console.log(JSON.stringify(payload, null, 2));
 
         const res = await fetch(`/thunder/${method}`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(payload)
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
         });
 
         if (!res.ok) {
-            const errorText = await res.text().catch(() => "");
-            throw new Error(`Proxy returned HTTP ${res.status}: ${errorText || res.statusText}`);
+          const errorText = await res.text().catch(() => '');
+          throw new Error(`Proxy returned HTTP ${res.status}: ${errorText || res.statusText}`);
         }
 
         const data = await res.json();
 
-        // ── DEBUG: Show the full raw response from proxy ──
         console.log(`thunderRPC ← raw response from /thunder/${method}:`);
         console.log(JSON.stringify(data, null, 2));
 
-        // Handle JSON-RPC error response (very common cause of "success but 500")
         if (data.error) {
-            const errMsg = data.error.message || "Unknown Thunder RPC error";
-            const rpcError = new Error(`Thunder RPC error: ${errMsg}`);
-            rpcError.code = data.error.code;
-            rpcError.data = data.error.data;
-            throw rpcError;
+          const errMsg = data.error.message || 'Unknown Thunder RPC error';
+          const rpcError = new Error(`Thunder RPC error: ${errMsg}`);
+          rpcError.code = data.error.code;
+          rpcError.data = data.error.data;
+          throw rpcError;
         }
 
-        // ── Your existing method-specific handling ──
-if (method === "balance") {
-    const rawResult = data?.result;
+        // ── Balance ──
+        if (method === 'balance') {
+          const rawResult = data?.result;
+          let sats = 0;
 
-    let sats = 0;
+          if (typeof rawResult === 'number') {
+            sats = Math.floor(rawResult);
+          } else if (typeof rawResult === 'string') {
+            sats = parseInt(rawResult.replace(/,/g, ''), 10) || 0;
+          } else if (rawResult && typeof rawResult === 'object') {
+            const possibleSats = rawResult.total_sats || rawResult.sats || rawResult.balance || rawResult.confirmed || rawResult.result?.total_sats;
+            sats = parseInt(possibleSats, 10) || 0;
+          }
 
-    if (typeof rawResult === 'number') {
-        sats = Math.floor(rawResult);
-    }
-    else if (typeof rawResult === 'string') {
-        const cleaned = rawResult.replace(/,/g, '');
-        sats = parseInt(cleaned, 10) || 0;
-    }
-    else if (rawResult && typeof rawResult === 'object') {
-        const possibleSats =
-            rawResult.total_sats ||
-            rawResult.sats ||
-            rawResult.balance ||
-            rawResult.confirmed ||
-            rawResult.result?.total_sats;
+          confirmedBalance = sats;
+          const btc = sats / 1e8;
+          const displayBtc = btc.toFixed(8).replace(/\.?0+$/, '');
+          const balanceEl = document.getElementById('balance');
 
-        sats = parseInt(possibleSats, 10) || 0;
-    }
+          if (unconfirmedBalance !== null) {
+            balanceEl.innerHTML = '0 BTC';
+            let unconfirmedEl = document.getElementById('unconfirmedBalance');
+            if (!unconfirmedEl) {
+              unconfirmedEl = document.createElement('div');
+              unconfirmedEl.id = 'unconfirmedBalance';
+              balanceEl.after(unconfirmedEl);
+            }
+            const pendingBtc = (unconfirmedBalance / 1e8).toFixed(8).replace(/\.?0+$/, '');
+            unconfirmedEl.innerHTML = renderUnconfirmedPill(pendingBtc);
+          } else {
+            balanceEl.innerHTML = `${displayBtc} BTC`;
+          }
 
-    confirmedBalance = sats;
+          // Clear unconfirmed state once confirmed
+          const existingUnconfirmed = document.getElementById('unconfirmedBalance');
+          if (unconfirmedBalance !== null) {
+            if (confirmedBalance === unconfirmedBalance || confirmedBalance === (unconfirmedBalance + pendingSpend - 2000)) {
+              if (existingUnconfirmed) existingUnconfirmed.remove();
+              unconfirmedBalance = null;
+              pendingSpend = 0;
+              localStorage.removeItem('pendingSpend');
+              localStorage.removeItem('unconfirmedBalance');
+            }
+          }
 
-    const btc = sats / 1e8;
-    const displayBtc = btc.toFixed(8).replace(/\.?0+$/, '');
-
-    const balanceEl = document.getElementById("balance");
-    if (unconfirmedBalance !== null) {
-
-    // wallet has a pending tx — lock UI
-    balanceEl.innerHTML = "0 BTC";
-
-    let unconfirmedEl = document.getElementById("unconfirmedBalance");
-
-    if (!unconfirmedEl) {
-        unconfirmedEl = document.createElement("div");
-        unconfirmedEl.id = "unconfirmedBalance";
-        unconfirmedEl.style.marginTop = "6px";
-        unconfirmedEl.style.fontSize = "14px";
-        unconfirmedEl.style.color = "#888";
-        balanceEl.after(unconfirmedEl);
-    }
-
-    const btc = (unconfirmedBalance / 1e8).toFixed(8).replace(/\.?0+$/, '');
-unconfirmedEl.innerHTML = `
-<div style="
-    margin:15px auto;
-    padding:12px 18px;
-    border-radius:10px;
-    background:#1e1e1e;
-    color:#ffcc66;
-    font-family:sans-serif;
-    font-size:21px;
-    display:block;
-    width:fit-content;
-    text-align:center;
-    box-shadow:0 0 8px rgba(255,204,102,0.4);
-">
-Unconfirmed balance: <strong>${btc} BTC</strong>
-</div>
-`;
-
-} else {
-
-    balanceEl.innerHTML = `${displayBtc} BTC`;
-
-}
-
-    const existingUnconfirmed = document.getElementById("unconfirmedBalance");
-
-    if (unconfirmedBalance !== null) {
-
-if (
-    confirmedBalance === unconfirmedBalance ||
-    confirmedBalance === (unconfirmedBalance + pendingSpend - 2000)
-) {
-
-    if (existingUnconfirmed) existingUnconfirmed.remove();
-
-    unconfirmedBalance = null;
-    pendingSpend = 0;
-
-    localStorage.removeItem("pendingSpend");
-    localStorage.removeItem("unconfirmedBalance");
-
-   // document.getElementById("confirm").disabled = false;
-}
-
-    }
-
-    console.log(`Balance parsed: ${sats} sats → ${btc} BTC`);
-}
-
-if (method === 'get_new_address') {
-    const address = data?.result;
-    if (address && typeof address === 'string') {
-        if (autoShowQRCode) {
-            showAddressQRCode(address); // only auto-show QR code if allowed
+          console.log(`Balance parsed: ${sats} sats → ${btc} BTC`);
         }
-    } else {
-        console.error("Invalid or missing address in response:", data);
-    }
-}
+
+        if (method === 'get_new_address') {
+          const address = data?.result;
+          if (address && typeof address === 'string') {
+            if (autoShowQRCode) showAddressQRCode(address);
+          } else {
+            console.error('Invalid or missing address in response:', data);
+          }
+        }
 
         if (method === 'get_wallet_utxos') showInfo(data.result);
 
         return data;
 
-    } catch (err) {
+      } catch (err) {
         console.error(`thunderRPC failed for method "${method}":`, err);
-
-        // Optional: show global error UI if you want
-        // alert(`Thunder RPC error (${method}): ${err.message}`);
-
-        throw err; // let caller handle/display it
+        throw err;
+      }
     }
-}
 
+    // ── SHOW INFO (UTXOs) ────────────────────────────────────────────────────
+    function showInfo(info) {
+      showView('info');
+      const container = document.getElementById('view-info');
+      container.innerHTML = '';
 
+      if (!info || !Array.isArray(info) || info.length === 0) {
+        container.innerHTML = '<p class="tx-empty">No transactions found.</p>';
+        return;
+      }
 
+      const recentTxs = info.slice(0, 5);
+      const ul = document.createElement('ul');
+      ul.className = 'tx-list';
 
+      recentTxs.forEach(tx => {
+        const li = document.createElement('li');
+        li.className = 'tx-item';
 
+        const txid      = tx?.outpoint?.Regular?.txid || '??????';
+        const shortTxid = txid.substring(0, 6);
+        const sats      = tx?.output?.content?.Value || 0;
+        const btc       = (sats / 1e8).toFixed(8);
 
-// --------- UI Renderers ---------
-function showWalletList(wallets) {
-    let table = '<table class="center-table" style="border-collapse: collapse;"><thead><tr><th>Choose a Wallet</th></tr></thead><tbody>';
-    wallets.forEach(w => table += `<tr><td onclick="loadWallet('${w}'); thunderRPC('balance');">${w}</td></tr>`);
-    table += '</tbody></table>';
-    const resultDiv = document.getElementById("result");
-    resultDiv.innerHTML = table;
-    resultDiv.style.visibility = 'visible';
-    resultDiv.style.fontSize = '80px';
-    showDivs(['balance']);
-}
+        li.innerHTML = `
+          <div class="tx-row">
+            <div><span class="tx-id">${shortTxid}...</span></div>
+            <div style="text-align:right;"><span class="tx-amount-in">+${btc} BTC</span></div>
+          </div>
+        `;
+        ul.appendChild(li);
+      });
 
-function showTransactions(transactions) {
-    const transactionsElement = document.getElementById("transactions");
-    transactionsElement.innerHTML = ''; // clear old
-    let table = document.createElement('table');
-    table.style.borderCollapse = "collapse";
+      container.appendChild(ul);
+    }
 
-    transactions.forEach(tx => {
-        let row = table.insertRow();
-        row.insertCell().textContent = tx.txid.slice(0, 21) + "...";
-        row.insertCell().textContent = tx.amount;
-    });
+    // ── SHOW ADDRESS + QR CODE ───────────────────────────────────────────────
+    function showAddressQRCode(address) {
+      showView('receive');
 
-    transactionsElement.appendChild(table);
+      const qrEl = document.getElementById('qrcode');
+      qrEl.innerHTML = '';
+      document.getElementById('address').textContent = address;
 
-}
-
-function showAddressQRCode(address) {
-    hide(['mnemonicContainer', 'create_wallet', 'walletName', 'confirmWalletCreation', 'result', 'feerate', 'btcAddress', 'scanButton', 'btc', 'amount', 'confirm', 'reader']);
-    //showDivs(['qrcode', 'address', 'qrcode-wrapper']);
-
-
-
-    const wrapper = document.getElementById('qrcode-wrapper');
-wrapper.style.display = 'block';
-
-    wrapper.style.width = wrapper.style.height = '512px';
-   const addr = document.getElementById("address")
-   const qr = document.getElementById("qrcode")
-
-wrapper.style.visibility = 'visible';
-addr.innerHTML = address;
-qr.innerHTML = '';
-addr.style.visibility = 'visible';
-qr.style.visibility = 'visible';
-wrapper.style.marginTop = '-250px';
-//qr.style.marginTop = '-950px';
-
-//addr.style.marginTop = '-550px';
-    new QRCode(document.getElementById("qrcode"), {
+      new QRCode(qrEl, {
         text: `bitcoin:${address}`,
         width: 512,
         height: 512,
-        colorDark: "#000000",
-        colorLight: "#ffffff",
+        colorDark: '#000000',
+        colorLight: '#ffffff',
         correctLevel: QRCode.CorrectLevel.H
-    })
-}
-
-
-function selectSidechain(name) {
-    const page = name.toLowerCase() + ".html";
-    window.location.href = page;
-}
-
-function getCurrentSidechain() {
-    let path = window.location.pathname;
-    let page = path.split("/").pop();   // e.g., thunder.html
-    page = page.replace(".html", "");   // thunder
-    return page.toLowerCase();
-}
-
-
-async function detectRunningSidechainsViaProxy() {
-    const sidechains = [
-        { name: "BitNames", proxy: "bitnames" },
-        { name: "BitAssets", proxy: "bitassets" },
-        { name: "Thunder", proxy: "thunder" },
-        { name: "Truthcoin-DC", proxy: "truthcoin-dc" },
-        { name: "ZSide", proxy: "zside" },
-        { name: "Photon", proxy: "photon" },
-        { name: "Coinshift", proxy: "coinshift" }
-    ];
-
-    const running = [];
-
-    for (const sc of sidechains) {
-        try {
-            const res = await fetch(`/${sc.proxy}/ping`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "ping" })
-            });
-
-            // Only skip if 404
-            if (res.status !== 404 && res.status !== 502) {
-                running.push(sc.name);
-            } else {
-                console.log(`${sc.name} backend returned 404, skipping`);
-            }
-
-        } catch (err) {
-            console.log(`${sc.name} backend not reachable`, err.message);
-        }
+      });
     }
 
-    return running; // array of names that are actually reachable
-}
+    // ── SHOW DEPOSIT ─────────────────────────────────────────────────────────
+    async function showDeposit() {
+      showView('deposit');
+      autoShowQRCode = false;
 
+      const container = document.getElementById('view-deposit');
+      container.innerHTML = '';
 
-async function showSidechains() {
-    let resultDiv = document.getElementById("result");
+      try {
+        const newAddrData = await thunderRPC('get_new_address');
+        const rawAddress  = newAddrData?.result;
 
-    // Hide other UI elements
-    hide([
-        'mnemonicContainer','create_wallet','walletName','confirmWalletCreation',
-        'btcAddress','feerate','scanButton','btc','amount','confirm',
-        'qrcode-wrapper','qrcode','address','reader'
-    ]);
+        if (!rawAddress || typeof rawAddress !== 'string') {
+          container.innerHTML = `<p style="color:var(--color-accent-red);">Failed to get deposit address</p>`;
+          return;
+        }
 
-    // Optional: show a placeholder while detecting sidechains
-    resultDiv.innerHTML = '<h3 style="font-family: Consolas, monospace;">CHOOSE A SIDECHAIN:</h3><p style="color:#888; font-family: Consolas, monospace; font-size:40px;">Checking available sidechains...</p>';
-    resultDiv.style.visibility = 'visible';
-    resultDiv.style.fontSize = '50px';
-    resultDiv.style.marginTop = '-1250px';
-    resultDiv.style.textAlign = 'center';
+        const formattedData  = await thunderRPC('format_deposit_address', [rawAddress]);
+        const displayAddress = formattedData?.result || rawAddress;
 
-    const current = getCurrentSidechain(); // e.g., "thunder"
-    const running = await detectRunningSidechainsViaProxy();
+        container.innerHTML = `
+          <div class="deposit-card">
+            <h3 class="deposit-title">Deposit Address</h3>
+            <p id="depositAddress" class="deposit-address">${displayAddress}</p>
+            <div id="copyFeedback" class="deposit-copy-feedback">Copied!</div>
+            <div class="deposit-amount-row">
+              <input type="number" id="depositAmount" placeholder="0.00" class="deposit-amount-input">
+              <span class="deposit-btc-label"> BTC</span>
+            </div>
+            <button id="depositButton" class="deposit-submit-btn">DEPOSIT</button>
+          </div>
+        `;
 
-    // Build the list once we know which sidechains are running
-   let html = '<h3 style="font-family: Consolas, monospace;">CHOOSE A SIDECHAIN:</h3>';
-    html += '<ul class="sidechain-list" style="padding:0; font-family: \'Consolas, monospace\'; margin:20px auto; max-width:600px; text-align:center;">';
+        const addressEl  = document.getElementById('depositAddress');
+        const feedbackEl = document.getElementById('copyFeedback');
 
-    // Mainchain always first
-    html += `<li class="sidechain-item" onclick="window.location.href='index.html'">Mainchain</li>`;
+        addressEl.addEventListener('click', async () => {
+          try {
+            await navigator.clipboard.writeText(displayAddress);
+            feedbackEl.style.display = 'block';
+            setTimeout(() => feedbackEl.style.display = 'none', 1500);
+          } catch (err) { console.error(err); }
+        });
 
-    // Add running sidechains except current
-    running.forEach(name => {
+        document.getElementById('depositButton').addEventListener('click', async function () {
+          const amountBtc = parseFloat(document.getElementById('depositAmount').value);
+          if (isNaN(amountBtc) || amountBtc <= 0) { alert('Enter a valid amount'); return; }
+
+          const valueSats = btcToSats(amountBtc);
+          const feeSats   = 2000;
+
+          container.innerHTML += `<p style="margin-top:20px;">Creating deposit...</p>`;
+          this.disabled = true;
+
+          try {
+            const response = await thunderRPC('create_deposit', [rawAddress, valueSats, feeSats]);
+            if (response?.error) {
+              container.innerHTML += `<p style="color:red;">Deposit failed</p>`;
+              this.disabled = false;
+              return;
+            }
+            container.innerHTML += `<p style="color:var(--color-accent-green);">Deposit transaction created</p>`;
+            thunderRPC('balance');
+            thunderRPC('get_wallet_utxos');
+          } catch (err) {
+            console.error(err);
+            container.innerHTML += `<p style="color:red;">Error creating deposit</p>`;
+            this.disabled = false;
+          }
+        });
+
+      } catch (err) {
+        console.error('showDeposit error:', err);
+        container.innerHTML = `<p style="color:var(--color-accent-red);">Error fetching deposit address</p>`;
+      } finally {
+        autoShowQRCode = true;
+      }
+    }
+
+    // ── SHOW SIDECHAINS ──────────────────────────────────────────────────────
+    async function showSidechainsView() {
+      showView('sidechains');
+      const container = document.getElementById('view-sidechains');
+      container.innerHTML = `<h3>CHOOSE A SIDECHAIN:</h3><p class="sidechain-checking">Checking available sidechains...</p>`;
+
+      const current = getCurrentSidechain();
+      const running = await detectRunningSidechainsViaProxy();
+
+      let html = '<h3>CHOOSE A SIDECHAIN:</h3><ul class="sidechain-list">';
+      html += `<li class="sidechain-item" onclick="window.location.href='index.html'">Mainchain</li>`;
+      running.forEach(name => {
         const lower = name.toLowerCase();
         if (lower !== current) {
-            html += `<li class="sidechain-item" onclick="window.location.href='${lower}.html'">${name}</li>`;
+          html += `<li class="sidechain-item" onclick="window.location.href='${lower}.html'">${name}</li>`;
         }
+      });
+      html += '</ul>';
+      container.innerHTML = html;
+    }
+
+    // ── SEND BUTTON ───────────────────────────────────────────────────────────
+    document.getElementById('sendButton').addEventListener('click', () => {
+      showView('send');
+      document.getElementById('reader').classList.add('hidden');
+      document.getElementById('btcAddress').value = '';
+      document.getElementById('amount').value = '0';
+      document.getElementById('btcForm').style.display = 'block';
+      ['btcAddress', 'amount', 'scanButton', 'btc-label', 'confirm'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.visibility = 'visible';
+      });
     });
 
-    html += '</ul>';
-    resultDiv.innerHTML = html;
-
-    // Style the list nicely
-    const items = document.querySelectorAll('.sidechain-item');
-    items.forEach(item => {
-        item.style.fontSize = '48px';
-        item.style.padding = '20px';
-        item.style.margin = '10px auto';
-        item.style.cursor = 'pointer';
-        item.style.background = '#111';
-        item.style.fontFamily = 'Consolas, monospace';
-        item.style.color = 'white';
-        item.style.borderRadius = '12px';
-        item.style.transition = 'all 0.2s ease-in-out';
-        item.onmouseover = () => { item.style.background = '#333'; item.style.transform = 'scale(1.05)'; };
-        item.onmouseout = () => { item.style.background = '#111'; item.style.transform = 'scale(1)'; };
+    // ── RECEIVE BUTTON ────────────────────────────────────────────────────────
+    document.getElementById('receiveButton').addEventListener('click', () => {
+      thunderRPC('get_new_address');
     });
 
-    resultDiv.style.visibility = 'visible';
-}
+    // ── CONFIRM SEND ──────────────────────────────────────────────────────────
+    document.getElementById('confirm').addEventListener('click', async (e) => {
+      e.preventDefault();
 
+      if (unconfirmedBalance !== null) { alert('Transaction already pending confirmation'); return; }
 
+      const address   = document.getElementById('btcAddress').value.trim();
+      const amountBtc = parseFloat(document.getElementById('amount').value);
+      const balanceEl = document.getElementById('balance');
 
+      if (!isValidThunderAddress(address)) { alert('Invalid mainchain address (25–32 characters expected)'); return; }
+      if (isNaN(amountBtc) || amountBtc <= 0) { alert('Enter a valid amount greater than 0'); return; }
 
+      const valueSats  = btcToSats(amountBtc);
+      const feeSats    = 2000;
+      const totalSpend = valueSats + feeSats;
 
+      if (totalSpend > confirmedBalance) { alert('Not enough funds for amount + fee'); return; }
 
+      showView('result');
+      const resultDiv = document.getElementById('view-result');
+      resultDiv.innerHTML = '<p>Sending transaction...</p>';
 
+      try {
+        const response = await thunderRPC('transfer', [address, valueSats, feeSats]);
 
-// --------- Periodic Updates ---------
-function startTimers() {
-    thunderRPC('balance');
-    
-    thunderRPC('get_wallet_utxos');
+        if (response?.error) {
+          resultDiv.innerHTML = `<p style="color:red;">Transfer failed: ${response.error.message || JSON.stringify(response.error)}</p>`;
+          return;
+        }
 
-    if (timer) clearInterval(timer);
-    timer = setInterval(() => {
+        resultDiv.innerHTML = `<p style="color:var(--color-accent-green);">Transaction broadcast.</p>`;
+
+        const newUnconfirmedBalance = confirmedBalance - totalSpend;
+        unconfirmedBalance = newUnconfirmedBalance;
+        pendingSpend = totalSpend;
+        localStorage.setItem('pendingSpend', pendingSpend);
+        localStorage.setItem('unconfirmedBalance', unconfirmedBalance);
+
+        balanceEl.innerHTML = '0 BTC';
+
+        let unconfirmedEl = document.getElementById('unconfirmedBalance');
+        if (!unconfirmedEl) {
+          unconfirmedEl = document.createElement('div');
+          unconfirmedEl.id = 'unconfirmedBalance';
+          balanceEl.after(unconfirmedEl);
+        }
+        const btc = (newUnconfirmedBalance / 1e8).toFixed(8).replace(/\.?0+$/, '');
+        unconfirmedEl.innerHTML = renderUnconfirmedPill(btc);
+
         thunderRPC('balance');
-        
-        
-    }, 5000);
-}
+        thunderRPC('get_wallet_utxos');
 
-// --------- On Page Load ---------
-document.addEventListener('DOMContentLoaded', () => {
-    startTimers();
-});
-</script>
+      } catch (err) {
+        console.error('Transfer error:', err);
+        resultDiv.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
+      }
+    });
 
-  </html>
+    // ── QR SCANNER ────────────────────────────────────────────────────────────
+    let scanner = null;
+
+    document.getElementById('scanButton').addEventListener('click', async () => {
+      const reader = document.getElementById('reader');
+      ['btcAddress', 'amount', 'scanButton', 'btc-label', 'confirm'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.visibility = 'hidden';
+      });
+      reader.classList.remove('hidden');
+      reader.style.visibility = 'visible';
+
+      if (!scanner) scanner = new Html5Qrcode('reader');
+
+      try {
+        await scanner.start(
+          { facingMode: 'environment' },
+          { fps: 10, qrbox: { width: 2000, height: 1000 } },
+          (decodedText) => {
+            handleScannedText(decodedText);
+            scanner.stop();
+            reader.classList.add('hidden');
+          },
+          () => {}
+        );
+      } catch (err) { console.error('Camera start failed:', err); }
+    });
+
+    function handleScannedText(text) {
+      let clean   = text.replace(/^[a-zA-Z]+:/, '').trim();
+      let parts   = clean.split('?');
+      let address = parts[0].trim();
+      let amount  = parts[1] ? new URLSearchParams(parts[1]).get('amount') : null;
+
+      if (isValidThunderAddress(address)) {
+        document.getElementById('btcAddress').value = address;
+        if (amount) document.getElementById('amount').value = amount;
+        ['btcAddress', 'amount', 'scanButton', 'btc-label', 'confirm'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.style.visibility = 'visible';
+        });
+      } else {
+        alert('Invalid address (expected 25–32 character mainchain address)');
+      }
+    }
+
+    // ── WALLET LIST ───────────────────────────────────────────────────────────
+    function showWalletList(wallets) {
+      showView('result');
+      const resultDiv = document.getElementById('view-result');
+      let table = '<table class="center-table" style="border-collapse:collapse; font-size:80px;"><thead><tr><th>Choose a Wallet</th></tr></thead><tbody>';
+      wallets.forEach(w => table += `<tr><td onclick="loadWallet('${w}'); thunderRPC('balance');">${w}</td></tr>`);
+      table += '</tbody></table>';
+      resultDiv.innerHTML = table;
+    }
+
+    function showTransactions(transactions) {
+      const el = document.getElementById('transactions');
+      el.innerHTML = '';
+      let table = document.createElement('table');
+      table.style.borderCollapse = 'collapse';
+      transactions.forEach(tx => {
+        let row = table.insertRow();
+        row.insertCell().textContent = tx.txid.slice(0, 21) + '...';
+        row.insertCell().textContent = tx.amount;
+      });
+      el.appendChild(table);
+    }
+
+    // ── HELPERS ───────────────────────────────────────────────────────────────
+    function isValidThunderAddress(address) {
+      return /^[1-9A-HJ-NP-Za-km-z]{25,32}$/.test(address);
+    }
+
+    function btcToSats(btc) { return Math.floor(btc * 1e8); }
+
+    function getCurrentSidechain() {
+      return window.location.pathname.split('/').pop().replace('.html', '').toLowerCase();
+    }
+
+    async function detectRunningSidechainsViaProxy() {
+      const sidechains = [
+        { name: 'BitNames',    proxy: 'bitnames' },
+        { name: 'BitAssets',   proxy: 'bitassets' },
+        { name: 'Thunder',     proxy: 'thunder' },
+        { name: 'Truthcoin-DC',proxy: 'truthcoin-dc' },
+        { name: 'ZSide',       proxy: 'zside' },
+        { name: 'Photon',      proxy: 'photon' },
+        { name: 'Coinshift',   proxy: 'coinshift' }
+      ];
+
+      const running = [];
+      for (const sc of sidechains) {
+        try {
+          const res = await fetch(`/${sc.proxy}/ping`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'ping' })
+          });
+          if (res.status !== 404 && res.status !== 502) running.push(sc.name);
+        } catch (err) { console.log(`${sc.name} backend not reachable`, err.message); }
+      }
+      return running;
+    }
+
+    // ── TIMERS ────────────────────────────────────────────────────────────────
+    function startTimers() {
+      thunderRPC('balance');
+      thunderRPC('get_wallet_utxos');
+      if (timer) clearInterval(timer);
+      timer = setInterval(() => thunderRPC('balance'), 5000);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      startTimers();
+    });
+
+  </script>
+</html>
