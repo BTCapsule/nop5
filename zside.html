@@ -878,6 +878,11 @@
       });
     }
 
+ // ── RECEIVE BUTTON ────────────────────────────────────────────────────────
+    document.getElementById('receiveButton').addEventListener('click', () => {
+      handleReceive();
+    });
+
     // ── SHOW DEPOSIT ─────────────────────────────────────────────────────────
     async function showDeposit() {
       showView('deposit');
@@ -991,10 +996,7 @@
       });
     });
 
-    // ── RECEIVE BUTTON ────────────────────────────────────────────────────────
-    document.getElementById('receiveButton').addEventListener('click', () => {
-      handleReceive();
-    });
+
 
     // ── CONFIRM SEND ──────────────────────────────────────────────────────────
     document.getElementById('confirm').addEventListener('click', async (e) => {
@@ -1020,7 +1022,20 @@
       resultDiv.innerHTML = '<p>Sending transaction...</p>';
 
       try {
-        const response = await zsideRPC('transfer', [address, valueSats, feeSats]);
+        const type = getAddressType(address);
+
+if (!type) {
+  resultDiv.innerHTML = `<p style="color:red;">Invalid address type</p>`;
+  return;
+}
+
+let response;
+
+if (type === 'transparent') {
+  response = await zsideRPC('transparent_transfer', [address, valueSats, feeSats]);
+} else {
+  response = await zsideRPC('shielded_transfer', [address, valueSats, feeSats]);
+}
 
         if (response?.error) {
           resultDiv.innerHTML = `<p style="color:red;">Transfer failed: ${response.error.message || JSON.stringify(response.error)}</p>`;
@@ -1097,7 +1112,7 @@
           if (el) el.style.visibility = 'visible';
         });
       } else {
-        alert('Invalid address (expected 25–32 character mainchain address)');
+        alert('Invalid address (expected 25–32 character zSide address)');
       }
     }
 
@@ -1125,9 +1140,18 @@
     }
 
     // ── HELPERS ───────────────────────────────────────────────────────────────
-    function isValidzsideAddress(address) {
-      return /^[1-9A-HJ-NP-Za-km-z]{25,32}$/.test(address);
-    }
+function isValidzsideAddress(address) {
+  const transparent = /^[1-9A-HJ-NP-Za-km-z]{25,32}$/;
+  const shielded = /^t-shld1[0-9a-z]{50,120}$/;
+
+  return transparent.test(address) || shielded.test(address);
+}
+
+function getAddressType(address) {
+  if (/^t-shld1[0-9a-z]{50,120}$/.test(address)) return 'shielded';
+  if (/^[1-9A-HJ-NP-Za-km-z]{25,32}$/.test(address)) return 'transparent';
+  return null;
+}
 
     function btcToSats(btc) { return Math.floor(btc * 1e8); }
 
