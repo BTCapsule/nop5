@@ -111,10 +111,14 @@ position: absolute;
         font-size: 36px;
         font-family: sans-serif;
         text-align: center;
-        margin-top: 200px;
-        margin-right: auto;
+        margin-top: 120px;
+        margin-bottom: -70px;
+        margin-right: 550px;
 position: absolute;
-        margin-left: auto;
+        margin-left: 350px;
+            word-break: break-all;     
+    overflow-wrap: break-word;
+    border-color: #00ff99;
         justify-content: center;
         bottom: 500px;
         width: 600px;
@@ -1232,9 +1236,9 @@ async function handleReceive() {
     shieldBtn.innerText = "Shield";
     shieldBtn.style.fontSize = "36px";
     shieldBtn.style.padding = "15px 30px";
-    shieldBtn.style.marginTop = "150px";
+    shieldBtn.style.marginTop = "75px";
   //  shieldBtn.style.display = "block";
-  //  shieldBtn.style.marginBottom = "-100px";
+   shieldBtn.style.marginLeft = "-400px";
     shieldBtn.style.backgroundColor = "#ffffff";
     shieldBtn.style.color = "#000000";
     shieldBtn.style.border = "2px solid #4ec9b0";
@@ -1252,7 +1256,10 @@ async function handleReceive() {
                 return;
             }
 
-            document.getElementById("address").innerText = shieldAddr;
+           taddr= document.getElementById("address");
+           taddr.style.marginLeft = "550px";
+           
+           taddr.innerText = shieldAddr;
 
             const qrContainer = document.getElementById("qrcode");
             qrContainer.innerHTML = '';
