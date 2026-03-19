@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html>
+  <meta name="viewport" content="width=1000, maximum-scale=1, user-scalable=no">
+  <meta name="application-name" content="LayerTwoLabs">
+  <meta name="msapplication-TileColor" content="#ffffff">
+  <meta name="msapplication-TileImage" content="https://btcapsule.com/images/qrCode.png">
+  <meta name="theme-color" content="#000000">
+  <link rel="apple-touch-icon" href="https://btcapsule.com/images/qrCode.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="BitNames">
+  <meta name="mobile-web-app-capable" content="yes">
+  <head>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+  </head>
+
+  <style>
+    /* =============================================
+       DESIGN TOKENS
+    ============================================= */
+    :root {
+      --color-bg:           #000000;
+      --color-fg:           #ffffff;
+      --color-muted:        #888888;
+      --color-dim:          #333333;
+      --color-panel-bg:     #111111;
+      --color-code-bg:      #252526;
+      --color-accent-green: #4ec9b0;
+      --color-accent-red:   #ff6b6b;
+      --color-accent-blue:  #9cdcfe;
+      --color-accent-yellow:#ffcc66;
+      --color-border:       #ffffff;
+
+      --font-ui:    sans-serif;
+      --font-mono:  Consolas, monospace;
+
+      --fs-title:          60px;
+      --fs-balance:        100px;
+      --fs-body:           34px;
+      --fs-input:          32px;
+      --fs-amount:         80px;
+      --fs-btc:            60px;
+      --fs-btn:            24px;
+      --fs-confirm:        50px;
+      --fs-sidechain-item: 48px;
+
+      --btn-padding: 20px 25px;
+      --btn-margin:  10px;
+    }
+
+    /* =============================================
+       RESET / BASE
+    ============================================= */
+    body {
+      color: var(--color-fg);
+      background: var(--color-bg);
+      margin: 0;
+      padding: 0;
+    }
+
+    h2 {
+      color: var(--color-fg);
+      font-size: var(--fs-title);
+      font-family: var(--font-ui);
+      margin-bottom: 20px;
+      margin-left: 40px;
+      margin-top: 20px;
+    }
+
+    li { list-style: none; }
+
+    /* =============================================
+       TABLES
+    ============================================= */
+    th, td { padding: 15px; text-align: left; }
+    table, th, td { border: 1px solid var(--color-border); }
+    th { background-color: var(--color-bg); color: var(--color-fg); }
+    tr:hover { background-color: #D6EEEE; }
+    tr:nth-child(even) { background-color: var(--color-bg); color: var(--color-fg); }
+    .center-table { margin-left: auto; margin-right: auto; }
+
+    /* =============================================
+       BUTTONS
+    ============================================= */
+    button {
+      background-color: var(--color-fg);
+      color: var(--color-bg);
+      padding: var(--btn-padding);
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: var(--fs-btn);
+      margin: var(--btn-margin);
+      cursor: pointer;
+      border: none;
+    }
+
+    /* =============================================
+       LAYOUT: CHROME
+    ============================================= */
+    #balance {
+      color: var(--color-fg);
+      font-size: var(--fs-balance);
+      font-family: var(--font-ui);
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    #button-container {
+      display: flex;
+      justify-content: center;
+    }
+
+    /* Fixed to viewport bottom */
+    #button-container2 {
+      position: fixed;
+      bottom: 20px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+    }
+
+    /* =============================================
+       LAYOUT: MIDDLE PANEL
+    ============================================= */
+    #panel {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 400px;
+      padding-bottom: 120px;
+      margin-top: 15px;
+    }
+
+    /* =============================================
+       VIEW: INFO / UTXOS  (#view-info)
+    ============================================= */
+    #view-info {
+      display: none;
+      font-family: var(--font-mono);
+      font-size: var(--fs-body);
+      color: #d4d4d4;
+      padding: 15px;
+      border-radius: 8px;
+      max-height: 60vh;
+      overflow-y: auto;
+      width: 100%;
+      max-width: 900px;
+    }
+
+    .tx-list  { list-style: none; padding: 0; margin: 0; }
+    .tx-item  { padding: 12px 0; border-bottom: 1px solid var(--color-dim); }
+    .tx-row   { display: flex; align-items: center; gap: 300px; }
+    .tx-id    { color: var(--color-accent-blue); font-weight: bold; }
+    .tx-amount-in      { color: var(--color-accent-green); font-weight: bold; }
+    .tx-amount-out     { color: var(--color-accent-red);   font-weight: bold; }
+    .tx-amount-unknown { color: var(--color-muted); }
+    .tx-empty { color: var(--color-accent-red); }
+
+    /* =============================================
+       VIEW: RECEIVE / QR CODE  (#view-receive)
+    ============================================= */
+    #view-receive {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+    }
+
+    #qrcode-wrapper {
+      border: 10px solid var(--color-border);
+      padding: 10px;
+      background-color: var(--color-fg);
+      width: 512px;
+      height: 512px;
+    }
+
+    #qrcode { text-align: center; }
+
+    #address {
+      color: var(--color-fg);
+      font-size: var(--fs-input);
+      font-family: var(--font-ui);
+      text-align: center;
+      word-wrap: break-word;
+      max-width: 600px;
+    }
+
+    /* =============================================
+       VIEW: SEND FORM  (#view-send)
+    ============================================= */
+    #view-send {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .amount-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    #amount {
+      background-color: var(--color-bg);
+      color: var(--color-fg);
+      font-size: var(--fs-amount);
+      width: 200px;
+      text-align: center;
+      border: none;
+      outline: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+    }
+
+    #btc-label {
+      font-size: var(--fs-btc);
+      font-family: var(--font-mono);
+      color: var(--color-fg);
+    }
+
+    #btcAddress {
+      background-color: var(--color-bg);
+      color: var(--color-fg);
+      font-size: var(--fs-input);
+      width: 800px;
+      border: none;
+      outline: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      text-align: center;
+      border-bottom: 1px solid var(--color-fg);
+      margin-top: 30px;
+    }
+
+    #feerate {
+      color: var(--color-fg);
+      font-size: var(--fs-input);
+      font-family: var(--font-ui);
+      text-align: center;
+      word-wrap: break-word;
+      margin-top: 10px;
+    }
+
+    #confirm {
+      display: block;
+      margin: 40px auto 0;
+      font-size: var(--fs-confirm);
+      color: var(--color-bg);
+    }
+
+    #reader {
+      width: 700px;
+      height: 500px;
+    }
+
+    /* =============================================
+       VIEW: DEPOSIT  (#view-deposit)
+    ============================================= */
+    #view-deposit {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      font-family: var(--font-mono);
+    }
+
+    .deposit-card {
+      padding: 20px 25px;
+      border-radius: 12px;
+      max-width: 700px;
+      margin: 30px auto;
+      text-align: center;
+      color: #d4d4d4;
+      box-shadow: 0 0 10px var(--color-accent-green);
+    }
+
+    .deposit-title {
+      color: var(--color-accent-green);
+      margin-bottom: 15px;
+      font-size: var(--fs-body);
+    }
+
+    .deposit-address {
+      font-size: 28px;
+      word-break: break-all;
+      background: var(--color-code-bg);
+      padding: 15px;
+      border-radius: 8px;
+      display: inline-block;
+      color: var(--color-accent-blue);
+      cursor: pointer;
+      user-select: all;
+    }
+
+    .deposit-copy-feedback {
+      color: var(--color-accent-green);
+      margin-top: 10px;
+      font-size: 16px;
+      display: none;
+    }
+
+    .deposit-amount-row { margin-top: 40px; }
+
+    .deposit-amount-input {
+      background: var(--color-bg);
+      color: var(--color-fg);
+      font-size: 60px;
+      width: 220px;
+      border: none;
+      border-bottom: 1px solid var(--color-fg);
+      text-align: center;
+      outline: none;
+    }
+
+    .deposit-btc-label {
+      font-size: 50px;
+      font-family: var(--font-mono);
+    }
+
+    .deposit-submit-btn {
+      display: block;
+      margin: 40px auto 0;
+      font-size: 42px;
+      padding: 18px 40px;
+    }
+
+    /* =============================================
+       VIEW: SIDECHAINS  (#view-sidechains)
+    ============================================= */
+    #view-sidechains {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 50px;
+      text-align: center;
+    }
+
+    .sidechain-list {
+      list-style: none;
+      padding: 0;
+      margin: 20px auto;
+      max-width: 600px;
+      text-align: center;
+    }
+
+    .sidechain-item {
+      font-size: var(--fs-sidechain-item);
+      padding: 20px;
+      margin: 10px auto;
+      cursor: pointer;
+      background: var(--color-panel-bg);
+      font-family: var(--font-mono);
+      color: var(--color-fg);
+      border-radius: 12px;
+      transition: background 0.2s ease-in-out, transform 0.2s ease-in-out;
+    }
+
+    .sidechain-item:hover {
+      background: var(--color-dim);
+      transform: scale(1.05);
+    }
+
+    .sidechain-checking {
+      color: var(--color-muted);
+      font-family: var(--font-mono);
+      font-size: 40px;
+    }
+
+    /* =============================================
+       VIEW: RESULT  (#view-result)
+    ============================================= */
+    #view-result {
+      display: none;
+      font-family: var(--font-mono);
+      font-size: var(--fs-body);
+      color: #d4d4d4;
+      padding: 15px;
+      border-radius: 8px;
+      max-height: 60vh;
+      overflow-y: auto;
+      width: 100%;
+      max-width: 900px;
+      text-align: center;
+    }
+
+    /* =============================================
+       UNCONFIRMED BALANCE PILL
+    ============================================= */
+    .unconfirmed-pill {
+      margin: 15px auto;
+      padding: 12px 18px;
+      border-radius: 10px;
+      background: #1e1e1e;
+      color: var(--color-accent-yellow);
+      font-family: var(--font-ui);
+      font-size: 21px;
+      display: block;
+      width: fit-content;
+      text-align: center;
+      box-shadow: 0 0 8px rgba(255, 204, 102, 0.4);
+    }
+
+    /* =============================================
+       WALLET / MNEMONIC
+    ============================================= */
+    #view-create-wallet {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    #walletName {
+      background-color: var(--color-bg);
+      color: var(--color-fg);
+      font-size: var(--fs-input);
+      width: 800px;
+      border: none;
+      outline: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      text-align: center;
+      border-bottom: 1px solid var(--color-fg);
+    }
+
+    #view-mnemonic {
+      display: none;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .word {
+      font-family: var(--font-ui);
+      font-size: 48px;
+      color: var(--color-bg);
+      background-color: var(--color-fg);
+      margin: 10px;
+      padding: 10px;
+    }
+
+    .sidechain-input {
+      background-color: var(--color-bg);
+      color: var(--color-fg);
+      font-size: var(--fs-input);
+      width: 800px;
+      border: none;
+      outline: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: center;
+      border-bottom: 1px solid var(--color-fg);
+      margin-top: 20px;
+      display: block;
+    }
+
+    .sidechain-button {
+      background-color: var(--color-fg);
+      color: var(--color-bg);
+      padding: var(--btn-padding);
+      text-align: center;
+      display: block;
+      font-size: var(--fs-btn);
+      margin: 20px auto;
+    }
+
+    /* =============================================
+       UTILITY
+    ============================================= */
+    .hidden { display: none !important; }
+
+    #html5-qrcode-button-camera-stop { display: none; }
+
+    #popup {
+      position: absolute;
+      width: 400px;
+      height: 900px;
+      background-color: var(--color-fg);
+    }
+
+    #dawg {
+      background-color: var(--color-bg);
+      height: 500px;
+    }
+
+    #transactions {
+      font-family: var(--font-ui);
+      font-size: 46px;
+    }
+
+  </style>
+
+  <body>
+
+    <!-- ── HEADER ─────────────────────────────── -->
+    <h2 class="exclude">BitNames</h2>
+    <br><br>
+
+    <!-- ── TOP NAV BUTTONS ───────────────────── -->
+    <div id="button-container" class="exclude">
+      <button id="displayBalance" onclick="bitnamesRPC('balance')">balance</button>
+      <button onclick="bitnamesRPC('get_wallet_utxos')">info</button>
+      <button onclick="showDeposit()">deposit</button>
+      <button onclick="runRPC('validator', 'GetSidechains')">sidechains</button>
+    </div>
+
+    <!-- ── BALANCE ────────────────────────────── -->
+    <div id="balance"></div>
+    <br><br>
+
+    <!-- ══════════════════════════════════════════
+         MIDDLE PANEL
+    ═══════════════════════════════════════════ -->
+    <div id="panel">
+
+      <!-- VIEW: INFO / UTXOS -->
+      <div id="view-info">
+        <!-- populated by showInfo() -->
+      </div>
+
+      <!-- VIEW: RECEIVE -->
+      <div id="view-receive">
+        <div id="qrcode-wrapper">
+          <div id="qrcode"></div>
+        </div>
+        <div id="address"></div>
+      </div>
+
+      <!-- VIEW: SEND -->
+      <div id="view-send">
+        <div id="reader" class="hidden"></div>
+
+        <div id="btcForm">
+          <div class="amount-row">
+            <input type="number" id="amount" name="amount" min="0" value="0" maxlength="15">
+            <span id="btc-label">BTC</span>
+          </div>
+          <br><br>
+          <button id="scanButton" class="exclude" type="button">SCAN</button>
+          <br>
+          <input type="text" id="btcAddress" name="btcAddress" placeholder="Enter Address">
+          <br><br>
+          <p id="feerate"></p>
+          <button id="confirm">CONFIRM</button>
+        </div>
+      </div>
+
+      <!-- VIEW: DEPOSIT -->
+      <div id="view-deposit">
+        <!-- populated by showDeposit() -->
+      </div>
+
+      <!-- VIEW: SIDECHAINS -->
+      <div id="view-sidechains">
+        <!-- populated by showSidechainsView() -->
+      </div>
+
+      <!-- VIEW: CREATE WALLET -->
+      <div id="view-create-wallet">
+        <input type="text" id="walletName" placeholder="Enter wallet name">
+        <br><br>
+        <button id="confirmWalletCreation">NEXT</button>
+      </div>
+
+      <!-- VIEW: MNEMONIC -->
+      <div id="view-mnemonic">
+        <!-- populated dynamically -->
+      </div>
+
+      <!-- VIEW: GENERIC RESULT -->
+      <div id="view-result">
+        <!-- send confirmations, errors, etc. -->
+      </div>
+
+    </div><!-- /#panel -->
+
+    <!-- ── BOTTOM FIXED NAV ───────────────────── -->
+    <div id="button-container2" class="exclude">
+      <button class="exclude" id="receiveButton">RECEIVE</button>
+      <button style="width:155px;" id="sendButton" class="exclude">SEND</button>
+    </div>
+
+  </body>
+
+  <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+  <script>
+
+    let timer = null;
+    let confirmedBalance = 0;
+    let pendingSpend = 0;
+    let unconfirmedBalance = null;
+
+    // Restore pending state from localStorage
+    const savedPending = localStorage.getItem('pendingSpend');
+    const savedUnconfirmed = localStorage.getItem('unconfirmedBalance');
+    if (savedPending) pendingSpend = parseInt(savedPending);
+    if (savedUnconfirmed) unconfirmedBalance = parseInt(savedUnconfirmed);
+
+    let autoShowQRCode = true;
+
+    // ── VIEW MANAGER ────────────────────────────────────────────────────────
+    const ALL_VIEWS = [
+      'view-info',
+      'view-receive',
+      'view-send',
+      'view-deposit',
+      'view-sidechains',
+      'view-create-wallet',
+      'view-mnemonic',
+      'view-result',
+    ];
+
+    function showView(name) {
+      ALL_VIEWS.forEach(id => {
+        document.getElementById(id).style.display = 'none';
+      });
+      const el = document.getElementById('view-' + name);
+      if (el) {
+        const flexViews = ['receive', 'send', 'deposit', 'sidechains', 'create-wallet', 'mnemonic'];
+        el.style.display = flexViews.includes(name) ? 'flex' : 'block';
+      }
+    }
+
+    // ── UNCONFIRMED BALANCE PILL ─────────────────────────────────────────────
+    function renderUnconfirmedPill(btcAmount) {
+      return `<div class="unconfirmed-pill">Unconfirmed balance: <strong>${btcAmount} BTC</strong></div>`;
+    }
+
+    // ── RPC WRAPPERS ─────────────────────────────────────────────────────────
+    async function callRPC(category, method, args = []) {
+      try {
+        const body = args.length ? { args } : undefined;
+        const res = await fetch(`/${category}/${method}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: body ? JSON.stringify(body) : undefined
+        });
+        return await res.json();
+      } catch (err) {
+        console.error(`RPC Error: ${category}/${method}`, err);
+        return { error: err.toString() };
+      }
+    }
+
+    async function runRPC(category, method, args = []) {
+      const data = await callRPC(category, method, args);
+      console.log(category, method, data);
+      if (method === 'GetSidechains') { showSidechainsView(); console.log(data.result); }
+      if (method === 'GetChainInfo')  { showInfo(data.result); console.log(data.result); }
+    }
+
+    async function bitnamesRPC(method, params = []) {
+      try {
+        const payload = {
+          jsonrpc: '2.0',
+          id: 1,
+          method,
+          params: params.length ? params : undefined
+        };
+
+        console.log(`bitnamesRPC → sending to /bitnames/${method}:`);
+        console.log(JSON.stringify(payload, null, 2));
+
+        const res = await fetch(`/bitnames/${method}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+          const errorText = await res.text().catch(() => '');
+          throw new Error(`Proxy returned HTTP ${res.status}: ${errorText || res.statusText}`);
+        }
+
+        const data = await res.json();
+
+        console.log(`bitnamesRPC ← raw response from /bitnames/${method}:`);
+        console.log(JSON.stringify(data, null, 2));
+
+        if (data.error) {
+          const errMsg = data.error.message || 'Unknown bitnames RPC error';
+          const rpcError = new Error(`bitnames RPC error: ${errMsg}`);
+          rpcError.code = data.error.code;
+          rpcError.data = data.error.data;
+          throw rpcError;
+        }
+
+        // ── Balance ──
+        if (method === 'balance') {
+          const rawResult = data?.result;
+          let sats = 0;
+
+          if (typeof rawResult === 'number') {
+            sats = Math.floor(rawResult);
+          } else if (typeof rawResult === 'string') {
+            sats = parseInt(rawResult.replace(/,/g, ''), 10) || 0;
+          } else if (rawResult && typeof rawResult === 'object') {
+            const possibleSats = rawResult.total_sats || rawResult.sats || rawResult.balance || rawResult.confirmed || rawResult.result?.total_sats;
+            sats = parseInt(possibleSats, 10) || 0;
+          }
+
+          confirmedBalance = sats;
+          const btc = sats / 1e8;
+          const displayBtc = btc.toFixed(8).replace(/\.?0+$/, '');
+          const balanceEl = document.getElementById('balance');
+
+          if (unconfirmedBalance !== null) {
+            balanceEl.innerHTML = '0 BTC';
+            let unconfirmedEl = document.getElementById('unconfirmedBalance');
+            if (!unconfirmedEl) {
+              unconfirmedEl = document.createElement('div');
+              unconfirmedEl.id = 'unconfirmedBalance';
+              balanceEl.after(unconfirmedEl);
+            }
+            const pendingBtc = (unconfirmedBalance / 1e8).toFixed(8).replace(/\.?0+$/, '');
+            unconfirmedEl.innerHTML = renderUnconfirmedPill(pendingBtc);
+          } else {
+            balanceEl.innerHTML = `${displayBtc} BTC`;
+          }
+
+          // Clear unconfirmed state once confirmed
+          const existingUnconfirmed = document.getElementById('unconfirmedBalance');
+          if (unconfirmedBalance !== null) {
+            if (confirmedBalance === unconfirmedBalance || confirmedBalance === (unconfirmedBalance + pendingSpend - 2000)) {
+              if (existingUnconfirmed) existingUnconfirmed.remove();
+              unconfirmedBalance = null;
+              pendingSpend = 0;
+              localStorage.removeItem('pendingSpend');
+              localStorage.removeItem('unconfirmedBalance');
+            }
+          }
+
+          console.log(`Balance parsed: ${sats} sats → ${btc} BTC`);
+        }
+
+        if (method === 'get_new_address') {
+          const address = data?.result;
+          if (address && typeof address === 'string') {
+            if (autoShowQRCode) showAddressQRCode(address);
+          } else {
+            console.error('Invalid or missing address in response:', data);
+          }
+        }
+
+        if (method === 'get_wallet_utxos') showInfo(data.result);
+
+        return data;
+
+      } catch (err) {
+        console.error(`bitnamesRPC failed for method "${method}":`, err);
+        throw err;
+      }
+    }
+
+    // ── SHOW INFO (UTXOs) ────────────────────────────────────────────────────
+    function showInfo(info) {
+      showView('info');
+      const container = document.getElementById('view-info');
+      container.innerHTML = '';
+
+      if (!info || !Array.isArray(info) || info.length === 0) {
+        container.innerHTML = '<p class="tx-empty">No transactions found.</p>';
+        return;
+      }
+
+      const recentTxs = info.slice(0, 5);
+      const ul = document.createElement('ul');
+      ul.className = 'tx-list';
+
+      recentTxs.forEach(tx => {
+        const li = document.createElement('li');
+        li.className = 'tx-item';
+
+        const txid      = tx?.outpoint?.Regular?.txid || '??????';
+        const shortTxid = txid.substring(0, 6);
+        const sats      = tx?.output?.content?.Value || 0;
+        const btc       = (sats / 1e8).toFixed(8);
+
+        li.innerHTML = `
+          <div class="tx-row">
+            <div><span class="tx-id">${shortTxid}...</span></div>
+            <div style="text-align:right;"><span class="tx-amount-in">+${btc} BTC</span></div>
+          </div>
+        `;
+        ul.appendChild(li);
+      });
+
+      container.appendChild(ul);
+    }
+
+    // ── SHOW ADDRESS + QR CODE ───────────────────────────────────────────────
+    function showAddressQRCode(address) {
+      showView('receive');
+
+      const qrEl = document.getElementById('qrcode');
+      qrEl.innerHTML = '';
+      document.getElementById('address').textContent = address;
+
+      new QRCode(qrEl, {
+        text: `bitcoin:${address}`,
+        width: 512,
+        height: 512,
+        colorDark: '#000000',
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.H
+      });
+    }
+
+    // ── SHOW DEPOSIT ─────────────────────────────────────────────────────────
+    async function showDeposit() {
+      showView('deposit');
+      autoShowQRCode = false;
+
+      const container = document.getElementById('view-deposit');
+      container.innerHTML = '';
+
+      try {
+        const newAddrData = await bitnamesRPC('get_new_address');
+        const rawAddress  = newAddrData?.result;
+
+        if (!rawAddress || typeof rawAddress !== 'string') {
+          container.innerHTML = `<p style="color:var(--color-accent-red);">Failed to get deposit address</p>`;
+          return;
+        }
+
+        const formattedData  = await bitnamesRPC('format_deposit_address', [rawAddress]);
+        const displayAddress = formattedData?.result || rawAddress;
+
+        container.innerHTML = `
+          <div class="deposit-card">
+            <h3 class="deposit-title">Deposit Address</h3>
+            <p id="depositAddress" class="deposit-address">${displayAddress}</p>
+            <div id="copyFeedback" class="deposit-copy-feedback">Copied!</div>
+            <div class="deposit-amount-row">
+              <input type="number" id="depositAmount" placeholder="0.00" class="deposit-amount-input">
+              <span class="deposit-btc-label"> BTC</span>
+            </div>
+            <button id="depositButton" class="deposit-submit-btn">DEPOSIT</button>
+          </div>
+        `;
+
+        const addressEl  = document.getElementById('depositAddress');
+        const feedbackEl = document.getElementById('copyFeedback');
+
+        addressEl.addEventListener('click', async () => {
+          try {
+            await navigator.clipboard.writeText(displayAddress);
+            feedbackEl.style.display = 'block';
+            setTimeout(() => feedbackEl.style.display = 'none', 1500);
+          } catch (err) { console.error(err); }
+        });
+
+        document.getElementById('depositButton').addEventListener('click', async function () {
+          const amountBtc = parseFloat(document.getElementById('depositAmount').value);
+          if (isNaN(amountBtc) || amountBtc <= 0) { alert('Enter a valid amount'); return; }
+
+          const valueSats = btcToSats(amountBtc);
+          const feeSats   = 2000;
+
+          container.innerHTML += `<p style="margin-top:20px;">Creating deposit...</p>`;
+          this.disabled = true;
+
+          try {
+            const response = await bitnamesRPC('create_deposit', [rawAddress, valueSats, feeSats]);
+            if (response?.error) {
+              container.innerHTML += `<p style="color:red;">Deposit failed</p>`;
+              this.disabled = false;
+              return;
+            }
+            container.innerHTML += `<p style="color:var(--color-accent-green);">Deposit transaction created</p>`;
+            bitnamesRPC('balance');
+            bitnamesRPC('get_wallet_utxos');
+          } catch (err) {
+            console.error(err);
+            container.innerHTML += `<p style="color:red;">Error creating deposit</p>`;
+            this.disabled = false;
+          }
+        });
+
+      } catch (err) {
+        console.error('showDeposit error:', err);
+        container.innerHTML = `<p style="color:var(--color-accent-red);">Error fetching deposit address</p>`;
+      } finally {
+        autoShowQRCode = true;
+      }
+    }
+
+    // ── SHOW SIDECHAINS ──────────────────────────────────────────────────────
+    async function showSidechainsView() {
+      showView('sidechains');
+      const container = document.getElementById('view-sidechains');
+      container.innerHTML = `<h3>CHOOSE A SIDECHAIN:</h3><p class="sidechain-checking">Checking available sidechains...</p>`;
+
+      const current = getCurrentSidechain();
+      const running = await detectRunningSidechainsViaProxy();
+
+      let html = '<h3>CHOOSE A SIDECHAIN:</h3><ul class="sidechain-list">';
+      html += `<li class="sidechain-item" onclick="window.location.href='index.html'">Mainchain</li>`;
+      running.forEach(name => {
+        const lower = name.toLowerCase();
+        if (lower !== current) {
+          html += `<li class="sidechain-item" onclick="window.location.href='${lower}.html'">${name}</li>`;
+        }
+      });
+      html += '</ul>';
+      container.innerHTML = html;
+    }
+
+    // ── SEND BUTTON ───────────────────────────────────────────────────────────
+    document.getElementById('sendButton').addEventListener('click', () => {
+      showView('send');
+      document.getElementById('reader').classList.add('hidden');
+      document.getElementById('btcAddress').value = '';
+      document.getElementById('amount').value = '0';
+      document.getElementById('btcForm').style.display = 'block';
+      ['btcAddress', 'amount', 'scanButton', 'btc-label', 'confirm'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.visibility = 'visible';
+      });
+    });
+
+    // ── RECEIVE BUTTON ────────────────────────────────────────────────────────
+    document.getElementById('receiveButton').addEventListener('click', () => {
+      bitnamesRPC('get_new_address');
+    });
+
+    // ── CONFIRM SEND ──────────────────────────────────────────────────────────
+    document.getElementById('confirm').addEventListener('click', async (e) => {
+      e.preventDefault();
+
+      if (unconfirmedBalance !== null) { alert('Transaction already pending confirmation'); return; }
+
+      const address   = document.getElementById('btcAddress').value.trim();
+      const amountBtc = parseFloat(document.getElementById('amount').value);
+      const balanceEl = document.getElementById('balance');
+
+      if (!isValidbitnamesAddress(address)) { alert('Invalid mainchain address (25–32 characters expected)'); return; }
+      if (isNaN(amountBtc) || amountBtc <= 0) { alert('Enter a valid amount greater than 0'); return; }
+
+      const valueSats  = btcToSats(amountBtc);
+      const feeSats    = 2000;
+      const totalSpend = valueSats + feeSats;
+
+      if (totalSpend > confirmedBalance) { alert('Not enough funds for amount + fee'); return; }
+
+      showView('result');
+      const resultDiv = document.getElementById('view-result');
+      resultDiv.innerHTML = '<p>Sending transaction...</p>';
+
+      try {
+        const response = await bitnamesRPC('transfer', [address, valueSats, feeSats]);
+
+        if (response?.error) {
+          resultDiv.innerHTML = `<p style="color:red;">Transfer failed: ${response.error.message || JSON.stringify(response.error)}</p>`;
+          return;
+        }
+
+        resultDiv.innerHTML = `<p style="color:var(--color-accent-green);">Transaction broadcast.</p>`;
+
+        const newUnconfirmedBalance = confirmedBalance - totalSpend;
+        unconfirmedBalance = newUnconfirmedBalance;
+        pendingSpend = totalSpend;
+        localStorage.setItem('pendingSpend', pendingSpend);
+        localStorage.setItem('unconfirmedBalance', unconfirmedBalance);
+
+        balanceEl.innerHTML = '0 BTC';
+
+        let unconfirmedEl = document.getElementById('unconfirmedBalance');
+        if (!unconfirmedEl) {
+          unconfirmedEl = document.createElement('div');
+          unconfirmedEl.id = 'unconfirmedBalance';
+          balanceEl.after(unconfirmedEl);
+        }
+        const btc = (newUnconfirmedBalance / 1e8).toFixed(8).replace(/\.?0+$/, '');
+        unconfirmedEl.innerHTML = renderUnconfirmedPill(btc);
+
+        bitnamesRPC('balance');
+        bitnamesRPC('get_wallet_utxos');
+
+      } catch (err) {
+        console.error('Transfer error:', err);
+        resultDiv.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
+      }
+    });
+
+    // ── QR SCANNER ────────────────────────────────────────────────────────────
+    let scanner = null;
+
+    document.getElementById('scanButton').addEventListener('click', async () => {
+      const reader = document.getElementById('reader');
+      ['btcAddress', 'amount', 'scanButton', 'btc-label', 'confirm'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.visibility = 'hidden';
+      });
+      reader.classList.remove('hidden');
+      reader.style.visibility = 'visible';
+
+      if (!scanner) scanner = new Html5Qrcode('reader');
+
+      try {
+        await scanner.start(
+          { facingMode: 'environment' },
+          { fps: 10, qrbox: { width: 2000, height: 1000 } },
+          (decodedText) => {
+            handleScannedText(decodedText);
+            scanner.stop();
+            reader.classList.add('hidden');
+          },
+          () => {}
+        );
+      } catch (err) { console.error('Camera start failed:', err); }
+    });
+
+    function handleScannedText(text) {
+      let clean   = text.replace(/^[a-zA-Z]+:/, '').trim();
+      let parts   = clean.split('?');
+      let address = parts[0].trim();
+      let amount  = parts[1] ? new URLSearchParams(parts[1]).get('amount') : null;
+
+      if (isValidbitnamesAddress(address)) {
+        document.getElementById('btcAddress').value = address;
+        if (amount) document.getElementById('amount').value = amount;
+        ['btcAddress', 'amount', 'scanButton', 'btc-label', 'confirm'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.style.visibility = 'visible';
+        });
+      } else {
+        alert('Invalid address (expected 25–32 character mainchain address)');
+      }
+    }
+
+    // ── WALLET LIST ───────────────────────────────────────────────────────────
+    function showWalletList(wallets) {
+      showView('result');
+      const resultDiv = document.getElementById('view-result');
+      let table = '<table class="center-table" style="border-collapse:collapse; font-size:80px;"><thead><tr><th>Choose a Wallet</th></tr></thead><tbody>';
+      wallets.forEach(w => table += `<tr><td onclick="loadWallet('${w}'); bitnamesRPC('balance');">${w}</td></tr>`);
+      table += '</tbody></table>';
+      resultDiv.innerHTML = table;
+    }
+
+    function showTransactions(transactions) {
+      const el = document.getElementById('transactions');
+      el.innerHTML = '';
+      let table = document.createElement('table');
+      table.style.borderCollapse = 'collapse';
+      transactions.forEach(tx => {
+        let row = table.insertRow();
+        row.insertCell().textContent = tx.txid.slice(0, 21) + '...';
+        row.insertCell().textContent = tx.amount;
+      });
+      el.appendChild(table);
+    }
+
+    // ── HELPERS ───────────────────────────────────────────────────────────────
+    function isValidbitnamesAddress(address) {
+      return /^[1-9A-HJ-NP-Za-km-z]{25,32}$/.test(address);
+    }
+
+    function btcToSats(btc) { return Math.floor(btc * 1e8); }
+
+    function getCurrentSidechain() {
+      return window.location.pathname.split('/').pop().replace('.html', '').toLowerCase();
+    }
+
+    async function detectRunningSidechainsViaProxy() {
+      const sidechains = [
+        { name: 'BitNames',    proxy: 'bitnames' },
+        { name: 'BitAssets',   proxy: 'bitassets' },
+        { name: 'Thunder',     proxy: 'thunder' },
+        { name: 'Truthcoin-DC',proxy: 'truthcoin-dc' },
+        { name: 'ZSide',       proxy: 'zside' },
+        { name: 'Photon',      proxy: 'photon' },
+        { name: 'Coinshift',   proxy: 'coinshift' }
+      ];
+
+      const running = [];
+      for (const sc of sidechains) {
+        try {
+          const res = await fetch(`/${sc.proxy}/ping`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'ping' })
+          });
+          if (res.status !== 404 && res.status !== 502) running.push(sc.name);
+        } catch (err) { console.log(`${sc.name} backend not reachable`, err.message); }
+      }
+      return running;
+    }
+
+    // ── TIMERS ────────────────────────────────────────────────────────────────
+    function startTimers() {
+      bitnamesRPC('balance');
+      bitnamesRPC('get_wallet_utxos');
+      if (timer) clearInterval(timer);
+      timer = setInterval(() => bitnamesRPC('balance'), 5000);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      startTimers();
+    });
+
+  </script>
+</html>
