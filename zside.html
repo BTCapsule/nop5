@@ -787,9 +787,9 @@
           } else if (typeof rawResult === 'string') {
             transparentSats = parseInt(rawResult.replace(/,/g, ''), 10) || 0;
           } else if (rawResult && typeof rawResult === 'object') {
-            if (rawResult.total_transparent_sats !== undefined || rawResult.available_shielded_sats !== undefined) {
+            if (rawResult.total_transparent_sats !== undefined || rawResult.total_shielded_sats !== undefined) {
               transparentSats = parseInt(rawResult.total_transparent_sats, 10) || 0;
-              shieldedSats    = parseInt(rawResult.available_shielded_sats,    10) || 0;
+              shieldedSats    = parseInt(rawResult.total_shielded_sats,    10) || 0;
             } else {
               const possibleSats = rawResult.total_sats || rawResult.sats || rawResult.balance || rawResult.confirmed || rawResult.result?.total_sats;
               transparentSats = parseInt(possibleSats, 10) || 0;
@@ -1101,7 +1101,7 @@
           if (type === 'shield') {
             availableSats = parseInt(raw.total_transparent_sats ?? raw.available_transparent_sats, 10) || 0;
           } else {
-            availableSats = parseInt(raw.available_shielded_sats ?? raw.available_shielded_sats, 10) || 0;
+            availableSats = parseInt(raw.total_shielded_sats ?? raw.available_shielded_sats, 10) || 0;
           }
         } else if (typeof raw === 'number') {
           availableSats = Math.floor(raw);
