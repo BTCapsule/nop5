@@ -348,6 +348,64 @@
     }
 
     /* =============================================
+       VIEW: SHIELD  (#view-shield)
+    ============================================= */
+    #view-shield {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      font-family: var(--font-mono);
+    }
+
+    .shield-card {
+      padding: 20px 25px;
+      border-radius: 12px;
+      max-width: 700px;
+      margin: 30px auto;
+      text-align: center;
+      color: #d4d4d4;
+      box-shadow: 0 0 10px var(--color-accent-purple);
+    }
+
+    .shield-title {
+      color: var(--color-accent-purple);
+      margin-bottom: 15px;
+      font-size: var(--fs-body);
+    }
+
+    .shield-amount-row {
+      margin-top: 40px;
+    }
+
+    .shield-amount-input {
+      background: var(--color-bg);
+      color: var(--color-fg);
+      font-size: 60px;
+      width: 220px;
+      border: none;
+      border-bottom: 1px solid var(--color-fg);
+      text-align: center;
+      outline: none;
+    }
+
+    .shield-btc-label {
+      font-size: 50px;
+      font-family: var(--font-mono);
+    }
+
+    .shield-btn-row {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 40px;
+    }
+
+    .shield-action-btn {
+      font-size: 42px;
+      padding: 18px 40px;
+    }
+
+    /* =============================================
        VIEW: SIDECHAINS  (#view-sidechains)
     ============================================= */
     #view-sidechains {
@@ -526,7 +584,7 @@
     <!-- ── TOP NAV BUTTONS ───────────────────── -->
     <div id="button-container" class="exclude">
       <button id="displayBalance" onclick="zsideRPC('get_wallet_utxos')">balance</button>
-      <button onclick="zsideRPC('get_wallet_utxos')">shield</button>
+      <button onclick="showShield()">shield</button>
       <button onclick="showDeposit()">deposit</button>
       <button onclick="runRPC('validator', 'GetSidechains')">sidechains</button>
     </div>
@@ -594,6 +652,11 @@
         <!-- populated dynamically -->
       </div>
 
+      <!-- VIEW: SHIELD / UNSHIELD -->
+      <div id="view-shield">
+        <!-- populated by showShield() -->
+      </div>
+
       <!-- VIEW: GENERIC RESULT -->
       <div id="view-result">
         <!-- send confirmations, errors, etc. -->
@@ -631,6 +694,7 @@
       'view-receive',
       'view-send',
       'view-deposit',
+      'view-shield',
       'view-sidechains',
       'view-create-wallet',
       'view-mnemonic',
@@ -643,7 +707,7 @@
       });
       const el = document.getElementById('view-' + name);
       if (el) {
-        const flexViews = ['receive', 'send', 'deposit', 'sidechains', 'create-wallet', 'mnemonic'];
+        const flexViews = ['receive', 'send', 'deposit', 'shield', 'sidechains', 'create-wallet', 'mnemonic'];
         el.style.display = flexViews.includes(name) ? 'flex' : 'block';
       }
     }
@@ -841,39 +905,75 @@
     // ── HANDLE RECEIVE ───────────────────────────────────────────────────────
     async function handleReceive() {
       const addrData = await zsideRPC('get_new_transparent_address');
-      const address  = addrData?.result;
+      const transparentAddress = addrData?.result;
+      if (!transparentAddress) { alert('Failed to get new address'); return; }
 
-      if (!address) { alert('Failed to get new address'); return; }
+      let shieldedAddress = null;
+      let currentMode = 'transparent'; // 'transparent' | 'shielded'
 
-      showAddressQRCode(address);
+      showView('receive');
 
-      // Append shield button
-      const addrEl  = document.getElementById('address');
-      const shieldBtn = document.createElement('button');
-      shieldBtn.innerText = 'Shield';
-      shieldBtn.className = 'shield-btn';
+      // Build the receive view with copy support and toggle button
+      const receiveView = document.getElementById('view-receive');
+      receiveView.innerHTML = `
+        <div id="qrcode-wrapper">
+          <div id="qrcode"></div>
+        </div>
+        <div id="address" class="deposit-address" style="margin-top:10px; max-width:600px; font-size:28px;"></div>
+        <div id="receiveCopyFeedback" class="deposit-copy-feedback">Copied!</div>
+        <button id="toggleAddressBtn" class="shield-btn" style="margin-top:20px;">SHIELD</button>
+      `;
 
-      addrEl.appendChild(shieldBtn);
+      function renderQR(addr) {
+        const qrEl = document.getElementById('qrcode');
+        qrEl.innerHTML = '';
+        new QRCode(qrEl, {
+          text: `bitcoin:${addr}`,
+          width: 512, height: 512,
+          colorDark: '#000000', colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.H
+        });
+        document.getElementById('address').textContent = addr;
+      }
 
-      shieldBtn.addEventListener('click', async () => {
+      renderQR(transparentAddress);
+
+      const addrEl     = document.getElementById('address');
+      const feedbackEl = document.getElementById('receiveCopyFeedback');
+      const toggleBtn  = document.getElementById('toggleAddressBtn');
+
+      addrEl.style.cursor = 'pointer';
+      addrEl.addEventListener('click', async () => {
+        const current = currentMode === 'transparent' ? transparentAddress : shieldedAddress;
         try {
-          const shieldData = await zsideRPC('get_new_shielded_address');
-          const shieldAddr = shieldData?.result;
-          if (!shieldAddr) { alert('Failed to get shielded address'); return; }
+          await navigator.clipboard.writeText(current);
+          feedbackEl.style.display = 'block';
+          setTimeout(() => feedbackEl.style.display = 'none', 1500);
+        } catch (err) { console.error(err); }
+      });
 
-          addrEl.innerText = shieldAddr;
-
-          const qrContainer = document.getElementById('qrcode');
-          qrContainer.innerHTML = '';
-          new QRCode(qrContainer, {
-            text: `bitcoin:${shieldAddr}`,
-            width: 512, height: 512,
-            colorDark: '#000000', colorLight: '#ffffff',
-            correctLevel: QRCode.CorrectLevel.H
-          });
-        } catch (err) {
-          console.error(err);
-          alert('Error generating shielded address');
+      toggleBtn.addEventListener('click', async () => {
+        if (currentMode === 'transparent') {
+          // Switch to shielded
+          if (!shieldedAddress) {
+            try {
+              const shieldData = await zsideRPC('get_new_shielded_address');
+              shieldedAddress = shieldData?.result;
+              if (!shieldedAddress) { alert('Failed to get shielded address'); return; }
+            } catch (err) {
+              console.error(err);
+              alert('Error generating shielded address');
+              return;
+            }
+          }
+          currentMode = 'shielded';
+          renderQR(shieldedAddress);
+          toggleBtn.textContent = 'TRANSPARENT';
+        } else {
+          // Switch back to transparent
+          currentMode = 'transparent';
+          renderQR(transparentAddress);
+          toggleBtn.textContent = 'SHIELD';
         }
       });
     }
@@ -960,6 +1060,87 @@
       } finally {
         autoShowQRCode = true;
       }
+    }
+
+    // ── SHOW SHIELD / UNSHIELD ───────────────────────────────────────────────
+    async function showShield() {
+      showView('shield');
+
+      const container = document.getElementById('view-shield');
+      container.innerHTML = `
+        <div class="shield-card">
+          <h3 class="shield-title">Shield / Unshield</h3>
+          <div class="shield-amount-row">
+            <input type="number" id="shieldAmount" placeholder="0.00" class="shield-amount-input">
+            <span class="shield-btc-label"> BTC</span>
+          </div>
+          <div class="shield-btn-row">
+            <button id="shieldActionBtn" class="shield-action-btn">SHIELD</button>
+            <button id="unshieldActionBtn" class="shield-action-btn">UNSHIELD</button>
+          </div>
+          <div id="shieldFeedback" style="margin-top:20px; font-size:28px;"></div>
+        </div>
+      `;
+
+      async function runShieldAction(type) {
+        const feedbackEl = document.getElementById('shieldFeedback');
+        const amountBtc  = parseFloat(document.getElementById('shieldAmount').value);
+
+        if (isNaN(amountBtc) || amountBtc <= 0) { alert('Enter a valid amount'); return; }
+
+        const valueSats = btcToSats(amountBtc);
+        const feeSats   = 2000;
+        const totalSpend = valueSats + feeSats;
+
+        // Fetch latest balance for validation
+        const balData = await zsideRPC('balance');
+        const raw = balData?.result;
+        let availableSats = 0;
+
+        if (raw && typeof raw === 'object') {
+          if (type === 'shield') {
+            availableSats = parseInt(raw.total_transparent_sats ?? raw.available_transparent_sats, 10) || 0;
+          } else {
+            availableSats = parseInt(raw.total_shielded_sats ?? raw.available_shielded_sats, 10) || 0;
+          }
+        } else if (typeof raw === 'number') {
+          availableSats = Math.floor(raw);
+        }
+
+        if (totalSpend > availableSats) {
+          const label = type === 'shield' ? 'transparent' : 'shielded';
+          alert(`Not enough ${label} funds for amount + fee (${feeSats} sats)`);
+          return;
+        }
+
+        feedbackEl.innerHTML = `<p style="color:var(--color-muted);">${type === 'shield' ? 'Shielding' : 'Unshielding'}...</p>`;
+        document.getElementById('shieldActionBtn').disabled   = true;
+        document.getElementById('unshieldActionBtn').disabled = true;
+
+        try {
+          const rpcMethod = type === 'shield' ? 'shield' : 'unshield';
+          const response  = await zsideRPC(rpcMethod, [valueSats, feeSats]);
+
+          if (response?.error) {
+            feedbackEl.innerHTML = `<p style="color:var(--color-accent-red);">${type === 'shield' ? 'Shield' : 'Unshield'} failed: ${response.error.message || JSON.stringify(response.error)}</p>`;
+            document.getElementById('shieldActionBtn').disabled   = false;
+            document.getElementById('unshieldActionBtn').disabled = false;
+            return;
+          }
+
+          feedbackEl.innerHTML = `<p style="color:var(--color-accent-green);">Transaction broadcast.</p>`;
+          zsideRPC('balance');
+          zsideRPC('get_wallet_utxos');
+        } catch (err) {
+          console.error('Shield/Unshield error:', err);
+          feedbackEl.innerHTML = `<p style="color:var(--color-accent-red);">Error: ${err.message}</p>`;
+          document.getElementById('shieldActionBtn').disabled   = false;
+          document.getElementById('unshieldActionBtn').disabled = false;
+        }
+      }
+
+      document.getElementById('shieldActionBtn').addEventListener('click',   () => runShieldAction('shield'));
+      document.getElementById('unshieldActionBtn').addEventListener('click', () => runShieldAction('unshield'));
     }
 
     // ── SHOW SIDECHAINS ──────────────────────────────────────────────────────
