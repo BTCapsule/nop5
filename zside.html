@@ -52,23 +52,8 @@
     /* =============================================
        RESET / BASE
     ============================================= */
-    body {
-      color: var(--color-fg);
-      background: var(--color-bg);
-      margin: 0;
-      padding: 0;
-    }
-
-    h2 {
-      color: var(--color-fg);
-      font-size: var(--fs-title);
-      font-family: var(--font-ui);
-      margin-bottom: 20px;
-      margin-left: 40px;
-      margin-top: 20px;
-    }
-
-    li { list-style: none; }
+    body { color: var(--color-fg); background: var(--color-bg); margin: 0; padding: 0; }
+    li   { list-style: none; }
 
     /* =============================================
        TABLES
@@ -81,7 +66,7 @@
     .center-table { margin-left: auto; margin-right: auto; }
 
     /* =============================================
-       BUTTONS
+       BUTTONS (general)
     ============================================= */
     button {
       background-color: var(--color-fg);
@@ -97,6 +82,82 @@
     }
 
     /* =============================================
+       HEADER BAR
+    ============================================= */
+    #header-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 40px 0 40px;
+    }
+
+    #page-title {
+      color: var(--color-fg);
+      font-size: var(--fs-title);
+      font-family: var(--font-ui);
+      margin: 0;
+    }
+
+    #menu-trigger {
+      font-size: 52px;
+      font-family: var(--font-ui);
+      color: var(--color-fg);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px 12px;
+      margin: 0;
+      line-height: 1;
+      letter-spacing: 6px;
+    }
+
+    /* =============================================
+       SIDE MENU OVERLAY
+    ============================================= */
+    #menu-overlay { display: none; position: fixed; inset: 0; z-index: 200; }
+    #menu-overlay.open { display: block; }
+
+    #menu-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.55);
+    }
+
+    #menu-drawer {
+      position: absolute;
+      top: 0; right: 0;
+      width: 360px;
+      height: 100%;
+      background: #111111;
+      border-left: 1px solid var(--color-dim);
+      display: flex;
+      flex-direction: column;
+      padding: 50px 0;
+      box-sizing: border-box;
+      transform: translateX(100%);
+      transition: transform 0.22s ease;
+    }
+
+    #menu-overlay.open #menu-drawer { transform: translateX(0); }
+
+    .menu-item {
+      font-family: var(--font-ui);
+      font-size: 42px;
+      color: var(--color-fg);
+      padding: 28px 48px;
+      cursor: pointer;
+      border: none;
+      background: none;
+      text-align: left;
+      width: 100%;
+      margin: 0;
+      transition: background 0.15s;
+      display: block;
+    }
+
+    .menu-item:hover { background: var(--color-dim); }
+
+    /* =============================================
        LAYOUT: CHROME
     ============================================= */
     #balance {
@@ -107,21 +168,24 @@
       margin-top: 30px;
     }
 
-    #button-container {
-      display: flex;
-      justify-content: center;
-    }
-
-    /* Fixed to viewport bottom */
     #button-container2 {
       position: fixed;
-      bottom: 20px;
-      left: 0;
-      right: 0;
+      bottom: 170px;
+      left: 0; right: 0;
       display: flex;
       justify-content: center;
       align-items: center;
+      gap: 30px;
       z-index: 100;
+    }
+
+    #receiveButton,
+    #sendButton {
+      font-size: 42px;
+      padding: 30px 60px;
+      border-radius: 16px;
+      margin: 0;
+      width: auto;
     }
 
     /* =============================================
@@ -132,12 +196,12 @@
       justify-content: center;
       align-items: flex-start;
       min-height: 400px;
-      padding-bottom: 120px;
+      padding-bottom: 300px;
       margin-top: 15px;
     }
 
     /* =============================================
-       VIEW: INFO / UTXOS  (#view-info)
+       VIEW: INFO / UTXOS
     ============================================= */
     #view-info {
       display: none;
@@ -162,7 +226,7 @@
     .tx-empty { color: var(--color-accent-red); }
 
     /* =============================================
-       VIEW: RECEIVE / QR CODE  (#view-receive)
+       VIEW: RECEIVE / QR CODE
     ============================================= */
     #view-receive {
       display: none;
@@ -192,7 +256,7 @@
       max-width: 600px;
     }
 
-    /* Shield button — appended dynamically next to address */
+    /* Shield button (appended dynamically) */
     .shield-btn {
       font-size: 36px;
       padding: 15px 30px;
@@ -205,388 +269,170 @@
     }
 
     /* =============================================
-       VIEW: SEND FORM  (#view-send)
+       VIEW: SEND FORM
     ============================================= */
-    #view-send {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-    }
+    #view-send { display: none; flex-direction: column; align-items: center; }
 
-    .amount-row {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-    }
+    .amount-row { display: flex; align-items: center; justify-content: center; gap: 12px; }
 
     #amount {
-      background-color: var(--color-bg);
-      color: var(--color-fg);
-      font-size: var(--fs-amount);
-      width: 200px;
-      text-align: center;
-      border: none;
-      outline: none;
-      -webkit-appearance: none;
-      -moz-appearance: none;
-      appearance: none;
+      background-color: var(--color-bg); color: var(--color-fg);
+      font-size: var(--fs-amount); width: 200px;
+      text-align: center; border: none; outline: none;
+      -webkit-appearance: none; -moz-appearance: none; appearance: none;
     }
 
-    #btc-label {
-      font-size: var(--fs-btc);
-      font-family: var(--font-mono);
-      color: var(--color-fg);
-    }
+    #btc-label { font-size: var(--fs-btc); font-family: var(--font-mono); color: var(--color-fg); }
 
     #btcAddress {
-      background-color: var(--color-bg);
-      color: var(--color-fg);
-      font-size: var(--fs-input);
-      width: 800px;
-      border: none;
-      outline: none;
-      -webkit-appearance: none;
-      -moz-appearance: none;
-      appearance: none;
-      text-align: center;
-      border-bottom: 1px solid var(--color-fg);
-      margin-top: 30px;
+      background-color: var(--color-bg); color: var(--color-fg);
+      font-size: var(--fs-input); width: 800px;
+      border: none; outline: none;
+      -webkit-appearance: none; -moz-appearance: none; appearance: none;
+      text-align: center; border-bottom: 1px solid var(--color-fg); margin-top: 30px;
     }
 
-    #feerate {
-      color: var(--color-fg);
-      font-size: var(--fs-input);
-      font-family: var(--font-ui);
-      text-align: center;
-      word-wrap: break-word;
-      margin-top: 10px;
-    }
-
-    #confirm {
-      display: block;
-      margin: 40px auto 0;
-      font-size: var(--fs-confirm);
-      color: var(--color-bg);
-    }
-
-    #reader {
-      width: 700px;
-      height: 500px;
-    }
+    #feerate { color: var(--color-fg); font-size: var(--fs-input); font-family: var(--font-ui); text-align: center; word-wrap: break-word; margin-top: 10px; }
+    #confirm { display: block; margin: 40px auto 0; font-size: var(--fs-confirm); color: var(--color-bg); }
+    #reader  { width: 700px; height: 500px; }
 
     /* =============================================
-       VIEW: DEPOSIT  (#view-deposit)
+       VIEW: DEPOSIT
     ============================================= */
-    #view-deposit {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      font-family: var(--font-mono);
-    }
+    #view-deposit { display: none; flex-direction: column; align-items: center; font-family: var(--font-mono); }
 
     .deposit-card {
-      padding: 20px 25px;
-      border-radius: 12px;
-      max-width: 700px;
-      margin: 30px auto;
-      text-align: center;
-      color: #d4d4d4;
+      padding: 20px 25px; border-radius: 12px; max-width: 700px;
+      margin: 30px auto; text-align: center; color: #d4d4d4;
       box-shadow: 0 0 10px var(--color-accent-green);
     }
 
-    .deposit-title {
-      color: var(--color-accent-green);
-      margin-bottom: 15px;
-      font-size: var(--fs-body);
-    }
+    .deposit-title   { color: var(--color-accent-green); margin-bottom: 15px; font-size: var(--fs-body); }
 
     .deposit-address {
-      font-size: 28px;
-      word-break: break-all;
-      background: var(--color-code-bg);
-      padding: 15px;
-      border-radius: 8px;
-      display: inline-block;
-      color: var(--color-accent-blue);
-      cursor: pointer;
-      user-select: all;
+      font-size: 28px; word-break: break-all; background: var(--color-code-bg);
+      padding: 15px; border-radius: 8px; display: inline-block;
+      color: var(--color-accent-blue); cursor: pointer; user-select: all;
     }
 
-    .deposit-copy-feedback {
-      color: var(--color-accent-green);
-      margin-top: 10px;
-      font-size: 16px;
-      display: none;
-    }
-
-    .deposit-amount-row {
-      margin-top: 40px;
-    }
+    .deposit-copy-feedback { color: var(--color-accent-green); margin-top: 10px; font-size: 16px; display: none; }
+    .deposit-amount-row    { margin-top: 40px; }
 
     .deposit-amount-input {
-      background: var(--color-bg);
-      color: var(--color-fg);
-      font-size: 60px;
-      width: 220px;
-      border: none;
-      border-bottom: 1px solid var(--color-fg);
-      text-align: center;
-      outline: none;
+      background: var(--color-bg); color: var(--color-fg);
+      font-size: 60px; width: 220px;
+      border: none; border-bottom: 1px solid var(--color-fg);
+      text-align: center; outline: none;
     }
 
-    .deposit-btc-label {
-      font-size: 50px;
-      font-family: var(--font-mono);
-    }
-
-    .deposit-submit-btn {
-      display: block;
-      margin: 40px auto 0;
-      font-size: 42px;
-      padding: 18px 40px;
-    }
+    .deposit-btc-label  { font-size: 50px; font-family: var(--font-mono); }
+    .deposit-submit-btn { display: block; margin: 40px auto 0; font-size: 42px; padding: 18px 40px; }
 
     /* =============================================
-       VIEW: SHIELD  (#view-shield)
-    ============================================= */
-    #view-shield {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      font-family: var(--font-mono);
-    }
-
-    .shield-card {
-      padding: 20px 25px;
-      border-radius: 12px;
-      max-width: 700px;
-      margin: 30px auto;
-      text-align: center;
-      color: #d4d4d4;
-      box-shadow: 0 0 10px var(--color-accent-purple);
-    }
-
-    .shield-title {
-      color: var(--color-accent-purple);
-      margin-bottom: 15px;
-      font-size: var(--fs-body);
-    }
-
-    .shield-amount-row {
-      margin-top: 40px;
-    }
-
-    .shield-amount-input {
-      background: var(--color-bg);
-      color: var(--color-fg);
-      font-size: 60px;
-      width: 220px;
-      border: none;
-      border-bottom: 1px solid var(--color-fg);
-      text-align: center;
-      outline: none;
-    }
-
-    .shield-btc-label {
-      font-size: 50px;
-      font-family: var(--font-mono);
-    }
-
-    .shield-btn-row {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      margin-top: 40px;
-    }
-
-    .shield-action-btn {
-      font-size: 42px;
-      padding: 18px 40px;
-    }
-
-    /* =============================================
-       VIEW: SIDECHAINS  (#view-sidechains)
+       VIEW: SIDECHAINS
     ============================================= */
     #view-sidechains {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      font-family: var(--font-mono);
-      font-size: 50px;
-      text-align: center;
+      display: none; flex-direction: column; align-items: center;
+      font-family: var(--font-mono); font-size: 50px; text-align: center;
     }
 
-    .sidechain-list {
-      list-style: none;
-      padding: 0;
-      margin: 20px auto;
-      max-width: 600px;
-      text-align: center;
-    }
+    .sidechain-list { list-style: none; padding: 0; margin: 20px auto; max-width: 600px; text-align: center; }
 
     .sidechain-item {
-      font-size: var(--fs-sidechain-item);
-      padding: 20px;
-      margin: 10px auto;
-      cursor: pointer;
-      background: var(--color-panel-bg);
-      font-family: var(--font-mono);
-      color: var(--color-fg);
-      border-radius: 12px;
+      font-size: var(--fs-sidechain-item); padding: 20px; margin: 10px auto;
+      cursor: pointer; background: var(--color-panel-bg); font-family: var(--font-mono);
+      color: var(--color-fg); border-radius: 12px;
       transition: background 0.2s ease-in-out, transform 0.2s ease-in-out;
     }
 
-    .sidechain-item:hover {
-      background: var(--color-dim);
-      transform: scale(1.05);
-    }
-
-    .sidechain-checking {
-      color: var(--color-muted);
-      font-family: var(--font-mono);
-      font-size: 40px;
-    }
+    .sidechain-item:hover { background: var(--color-dim); transform: scale(1.05); }
+    .sidechain-checking   { color: var(--color-muted); font-family: var(--font-mono); font-size: 40px; }
 
     /* =============================================
-       VIEW: RESULT  (#view-result)
+       VIEW: RESULT
     ============================================= */
     #view-result {
-      display: none;
-      font-family: var(--font-mono);
-      font-size: var(--fs-body);
-      color: #d4d4d4;
-      padding: 15px;
-      border-radius: 8px;
-      max-height: 60vh;
-      overflow-y: auto;
-      width: 100%;
-      max-width: 900px;
-      text-align: center;
+      display: none; font-family: var(--font-mono); font-size: var(--fs-body);
+      color: #d4d4d4; padding: 15px; border-radius: 8px;
+      max-height: 60vh; overflow-y: auto; width: 100%; max-width: 900px; text-align: center;
     }
 
     /* =============================================
        UNCONFIRMED BALANCE PILL
     ============================================= */
     .unconfirmed-pill {
-      margin: 15px auto;
-      padding: 12px 18px;
-      border-radius: 10px;
-      background: #1e1e1e;
-      color: var(--color-accent-yellow);
-      font-family: var(--font-ui);
-      font-size: 21px;
-      display: block;
-      width: fit-content;
-      text-align: center;
+      margin: 15px auto; padding: 12px 18px; border-radius: 10px;
+      background: #1e1e1e; color: var(--color-accent-yellow);
+      font-family: var(--font-ui); font-size: 21px;
+      display: block; width: fit-content; text-align: center;
       box-shadow: 0 0 8px rgba(255, 204, 102, 0.4);
     }
 
     /* =============================================
        WALLET / MNEMONIC
     ============================================= */
-    #view-create-wallet {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      gap: 20px;
-    }
+    #view-create-wallet { display: none; flex-direction: column; align-items: center; gap: 20px; }
 
     #walletName {
-      background-color: var(--color-bg);
-      color: var(--color-fg);
-      font-size: var(--fs-input);
-      width: 800px;
-      border: none;
-      outline: none;
-      -webkit-appearance: none;
-      -moz-appearance: none;
-      appearance: none;
-      text-align: center;
-      border-bottom: 1px solid var(--color-fg);
+      background-color: var(--color-bg); color: var(--color-fg);
+      font-size: var(--fs-input); width: 800px;
+      border: none; outline: none;
+      -webkit-appearance: none; -moz-appearance: none; appearance: none;
+      text-align: center; border-bottom: 1px solid var(--color-fg);
     }
 
-    #view-mnemonic {
-      display: none;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
+    #view-mnemonic { display: none; flex-wrap: wrap; justify-content: center; }
 
     .word {
-      font-family: var(--font-ui);
-      font-size: 48px;
-      color: var(--color-bg);
-      background-color: var(--color-fg);
-      margin: 10px;
-      padding: 10px;
+      font-family: var(--font-ui); font-size: 48px;
+      color: var(--color-bg); background-color: var(--color-fg);
+      margin: 10px; padding: 10px;
     }
 
     .sidechain-input {
-      background-color: var(--color-bg);
-      color: var(--color-fg);
-      font-size: var(--fs-input);
-      width: 800px;
-      border: none;
-      outline: none;
-      -webkit-appearance: none;
-      -moz-appearance: none;
-      appearance: none;
-      margin-left: auto;
-      margin-right: auto;
-      text-align: center;
-      border-bottom: 1px solid var(--color-fg);
-      margin-top: 20px;
-      display: block;
+      background-color: var(--color-bg); color: var(--color-fg);
+      font-size: var(--fs-input); width: 800px;
+      border: none; outline: none;
+      -webkit-appearance: none; -moz-appearance: none; appearance: none;
+      margin-left: auto; margin-right: auto;
+      text-align: center; border-bottom: 1px solid var(--color-fg);
+      margin-top: 20px; display: block;
     }
 
     .sidechain-button {
-      background-color: var(--color-fg);
-      color: var(--color-bg);
-      padding: var(--btn-padding);
-      text-align: center;
-      display: block;
-      font-size: var(--fs-btn);
-      margin: 20px auto;
+      background-color: var(--color-fg); color: var(--color-bg);
+      padding: var(--btn-padding); text-align: center;
+      display: block; font-size: var(--fs-btn); margin: 20px auto;
     }
 
     /* =============================================
        UTILITY
     ============================================= */
     .hidden { display: none !important; }
-
     #html5-qrcode-button-camera-stop { display: none; }
-
-    #popup {
-      position: absolute;
-      width: 400px;
-      height: 900px;
-      background-color: var(--color-fg);
-    }
-
-    #dawg {
-      background-color: var(--color-bg);
-      height: 500px;
-    }
-
-    #transactions {
-      font-family: var(--font-ui);
-      font-size: 46px;
-    }
+    #popup   { position: absolute; width: 400px; height: 900px; background-color: var(--color-fg); }
+    #dawg    { background-color: var(--color-bg); height: 500px; }
+    #transactions { font-family: var(--font-ui); font-size: 46px; }
 
   </style>
 
   <body>
 
-    <!-- ── HEADER ─────────────────────────────── -->
-    <h2 class="exclude">zSide</h2>
-    <br><br>
+    <!-- ── HEADER BAR ─────────────────────────── -->
+    <div id="header-bar" class="exclude">
+      <h2 id="page-title" class="exclude">zSide</h2>
+      <button id="menu-trigger" class="exclude">···</button>
+    </div>
 
-    <!-- ── TOP NAV BUTTONS ───────────────────── -->
-    <div id="button-container" class="exclude">
-      <button id="displayBalance" onclick="zsideRPC('get_wallet_utxos')">balance</button>
-      <button onclick="showShield()">shield</button>
-      <button onclick="showDeposit()">deposit</button>
-      <button onclick="runRPC('validator', 'GetSidechains')">sidechains</button>
+    <!-- ── SIDE MENU OVERLAY ─────────────────── -->
+    <div id="menu-overlay">
+      <div id="menu-backdrop"></div>
+      <div id="menu-drawer">
+        <button class="menu-item exclude" onclick="menuAction(() => zsideRPC('get_wallet_utxos'))">balance</button>
+        <button class="menu-item exclude" onclick="menuAction(() => zsideRPC('get_wallet_utxos'))">shield</button>
+        <button class="menu-item exclude" onclick="menuAction(() => showDeposit())">deposit</button>
+        <button class="menu-item exclude" onclick="menuAction(() => runRPC('validator', 'GetSidechains'))">sidechains</button>
+      </div>
     </div>
 
     <!-- ── BALANCE ────────────────────────────── -->
@@ -598,23 +444,15 @@
     ═══════════════════════════════════════════ -->
     <div id="panel">
 
-      <!-- VIEW: INFO / UTXOS -->
-      <div id="view-info">
-        <!-- populated by showInfo() -->
-      </div>
+      <div id="view-info"></div>
 
-      <!-- VIEW: RECEIVE -->
       <div id="view-receive">
-        <div id="qrcode-wrapper">
-          <div id="qrcode"></div>
-        </div>
+        <div id="qrcode-wrapper"><div id="qrcode"></div></div>
         <div id="address"></div>
       </div>
 
-      <!-- VIEW: SEND -->
       <div id="view-send">
         <div id="reader" class="hidden"></div>
-
         <div id="btcForm">
           <div class="amount-row">
             <input type="number" id="amount" name="amount" min="0" value="0" maxlength="15">
@@ -630,44 +468,24 @@
         </div>
       </div>
 
-      <!-- VIEW: DEPOSIT -->
-      <div id="view-deposit">
-        <!-- populated by showDeposit() -->
-      </div>
+      <div id="view-deposit"></div>
+      <div id="view-sidechains"></div>
 
-      <!-- VIEW: SIDECHAINS -->
-      <div id="view-sidechains">
-        <!-- populated by showSidechainsView() -->
-      </div>
-
-      <!-- VIEW: CREATE WALLET -->
       <div id="view-create-wallet">
         <input type="text" id="walletName" placeholder="Enter wallet name">
         <br><br>
         <button id="confirmWalletCreation">NEXT</button>
       </div>
 
-      <!-- VIEW: MNEMONIC -->
-      <div id="view-mnemonic">
-        <!-- populated dynamically -->
-      </div>
-
-      <!-- VIEW: SHIELD / UNSHIELD -->
-      <div id="view-shield">
-        <!-- populated by showShield() -->
-      </div>
-
-      <!-- VIEW: GENERIC RESULT -->
-      <div id="view-result">
-        <!-- send confirmations, errors, etc. -->
-      </div>
+      <div id="view-mnemonic"></div>
+      <div id="view-result"></div>
 
     </div><!-- /#panel -->
 
     <!-- ── BOTTOM FIXED NAV ───────────────────── -->
     <div id="button-container2" class="exclude">
-      <button class="exclude" id="receiveButton">RECEIVE</button>
-      <button style="width:155px;" id="sendButton" class="exclude">SEND</button>
+      <button id="receiveButton" class="exclude">RECEIVE</button>
+      <button id="sendButton"    class="exclude">SEND</button>
     </div>
 
   </body>
@@ -680,39 +498,45 @@
     let pendingSpend = 0;
     let unconfirmedBalance = null;
 
-    // Restore pending state from localStorage
-    const savedPending = localStorage.getItem('pendingSpend');
+    const savedPending     = localStorage.getItem('pendingSpend');
     const savedUnconfirmed = localStorage.getItem('unconfirmedBalance');
-    if (savedPending) pendingSpend = parseInt(savedPending);
+    if (savedPending)     pendingSpend       = parseInt(savedPending);
     if (savedUnconfirmed) unconfirmedBalance = parseInt(savedUnconfirmed);
 
     let autoShowQRCode = true;
 
-    // ── VIEW MANAGER ────────────────────────────────────────────────────────
+    // ── MENU ─────────────────────────────────────────────────────────────────
+    const menuOverlay = document.getElementById('menu-overlay');
+
+    document.getElementById('menu-trigger').addEventListener('click', () => {
+      menuOverlay.classList.add('open');
+    });
+
+    document.getElementById('menu-backdrop').addEventListener('click', () => {
+      menuOverlay.classList.remove('open');
+    });
+
+    function menuAction(fn) {
+      menuOverlay.classList.remove('open');
+      fn();
+    }
+
+    // ── VIEW MANAGER ─────────────────────────────────────────────────────────
     const ALL_VIEWS = [
-      'view-info',
-      'view-receive',
-      'view-send',
-      'view-deposit',
-      'view-shield',
-      'view-sidechains',
-      'view-create-wallet',
-      'view-mnemonic',
-      'view-result',
+      'view-info', 'view-receive', 'view-send', 'view-deposit',
+      'view-sidechains', 'view-create-wallet', 'view-mnemonic', 'view-result',
     ];
 
     function showView(name) {
-      ALL_VIEWS.forEach(id => {
-        document.getElementById(id).style.display = 'none';
-      });
+      ALL_VIEWS.forEach(id => { document.getElementById(id).style.display = 'none'; });
       const el = document.getElementById('view-' + name);
       if (el) {
-        const flexViews = ['receive', 'send', 'deposit', 'shield', 'sidechains', 'create-wallet', 'mnemonic'];
+        const flexViews = ['receive', 'send', 'deposit', 'sidechains', 'create-wallet', 'mnemonic'];
         el.style.display = flexViews.includes(name) ? 'flex' : 'block';
       }
     }
 
-    // ── UNCONFIRMED BALANCE PILL ─────────────────────────────────────────────
+    // ── UNCONFIRMED PILL ──────────────────────────────────────────────────────
     function renderUnconfirmedPill(btcAmount) {
       return `<div class="unconfirmed-pill">Unconfirmed balance: <strong>${btcAmount} BTC</strong></div>`;
     }
@@ -722,8 +546,7 @@
       try {
         const body = args.length ? { args } : undefined;
         const res = await fetch(`/${category}/${method}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: body ? JSON.stringify(body) : undefined
         });
         return await res.json();
@@ -742,19 +565,11 @@
 
     async function zsideRPC(method, params = []) {
       try {
-        const payload = {
-          jsonrpc: '2.0',
-          id: 1,
-          method,
-          params: params.length ? params : undefined
-        };
-
-        console.log(`zsideRPC → sending to /zside/${method}:`);
-        console.log(JSON.stringify(payload, null, 2));
+        const payload = { jsonrpc: '2.0', id: 1, method, params: params.length ? params : undefined };
+        console.log(`zsideRPC → /zside/${method}:`, JSON.stringify(payload, null, 2));
 
         const res = await fetch(`/zside/${method}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
 
@@ -764,15 +579,11 @@
         }
 
         const data = await res.json();
-
-        console.log(`zsideRPC ← raw response from /zside/${method}:`);
-        console.log(JSON.stringify(data, null, 2));
+        console.log(`zsideRPC ← /zside/${method}:`, JSON.stringify(data, null, 2));
 
         if (data.error) {
-          const errMsg = data.error.message || 'Unknown zside RPC error';
-          const rpcError = new Error(`zside RPC error: ${errMsg}`);
+          const rpcError = new Error(`zside RPC error: ${data.error.message || 'Unknown'}`);
           rpcError.code = data.error.code;
-          rpcError.data = data.error.data;
           throw rpcError;
         }
 
@@ -780,7 +591,7 @@
         if (method === 'balance') {
           const rawResult = data?.result;
           let transparentSats = 0;
-          let shieldedSats = 0;
+          let shieldedSats    = 0;
 
           if (typeof rawResult === 'number') {
             transparentSats = Math.floor(rawResult);
@@ -791,8 +602,8 @@
               transparentSats = parseInt(rawResult.total_transparent_sats, 10) || 0;
               shieldedSats    = parseInt(rawResult.total_shielded_sats,    10) || 0;
             } else {
-              const possibleSats = rawResult.total_sats || rawResult.sats || rawResult.balance || rawResult.confirmed || rawResult.result?.total_sats;
-              transparentSats = parseInt(possibleSats, 10) || 0;
+              const p = rawResult.total_sats || rawResult.sats || rawResult.balance || rawResult.confirmed || rawResult.result?.total_sats;
+              transparentSats = parseInt(p, 10) || 0;
             }
           }
 
@@ -811,8 +622,9 @@
               unconfirmedEl.id = 'unconfirmedBalance';
               balanceEl.after(unconfirmedEl);
             }
-            const btc = (unconfirmedBalance / 1e8).toFixed(8).replace(/\.?0+$/, '');
-            unconfirmedEl.innerHTML = renderUnconfirmedPill(btc);
+            unconfirmedEl.innerHTML = renderUnconfirmedPill(
+              (unconfirmedBalance / 1e8).toFixed(8).replace(/\.?0+$/, '')
+            );
           } else {
             balanceEl.innerHTML = `
               <div style="text-align:center; font-family:var(--font-mono);">
@@ -823,16 +635,15 @@
             `;
           }
 
-          // Clear unconfirmed state once confirmed
           const existingUnconfirmed = document.getElementById('unconfirmedBalance');
-          if (unconfirmedBalance !== null) {
-            if (confirmedBalance === unconfirmedBalance || confirmedBalance === (unconfirmedBalance + pendingSpend - 2000)) {
-              if (existingUnconfirmed) existingUnconfirmed.remove();
-              unconfirmedBalance = null;
-              pendingSpend = 0;
-              localStorage.removeItem('pendingSpend');
-              localStorage.removeItem('unconfirmedBalance');
-            }
+          if (unconfirmedBalance !== null &&
+              (confirmedBalance === unconfirmedBalance ||
+               confirmedBalance === (unconfirmedBalance + pendingSpend - 2000))) {
+            if (existingUnconfirmed) existingUnconfirmed.remove();
+            unconfirmedBalance = null;
+            pendingSpend = 0;
+            localStorage.removeItem('pendingSpend');
+            localStorage.removeItem('unconfirmedBalance');
           }
 
           console.log(`Balance parsed: total=${totalSats} sats, transparent=${transparentSats}, shielded=${shieldedSats}`);
@@ -843,12 +654,12 @@
         return data;
 
       } catch (err) {
-        console.error(`zsideRPC failed for method "${method}":`, err);
+        console.error(`zsideRPC failed for "${method}":`, err);
         throw err;
       }
     }
 
-    // ── SHOW INFO (UTXOs) ────────────────────────────────────────────────────
+    // ── SHOW INFO (UTXOs) ─────────────────────────────────────────────────────
     function showInfo(info) {
       showView('info');
       const container = document.getElementById('view-info');
@@ -859,19 +670,16 @@
         return;
       }
 
-      const recentTxs = info.slice(0, 5);
       const ul = document.createElement('ul');
       ul.className = 'tx-list';
 
-      recentTxs.forEach(tx => {
+      info.slice(0, 5).forEach(tx => {
         const li = document.createElement('li');
         li.className = 'tx-item';
-
-        const txid     = tx?.outpoint?.Regular?.txid || '??????';
+        const txid      = tx?.outpoint?.Regular?.txid || '??????';
         const shortTxid = txid.substring(0, 6);
-        const sats     = tx?.output?.content?.Value || 0;
-        const btc      = (sats / 1e8).toFixed(8);
-
+        const sats      = tx?.output?.content?.Value || 0;
+        const btc       = (sats / 1e8).toFixed(8);
         li.innerHTML = `
           <div class="tx-row">
             <div><span class="tx-id">${shortTxid}...</span></div>
@@ -884,116 +692,65 @@
       container.appendChild(ul);
     }
 
-    // ── SHOW ADDRESS + QR CODE ───────────────────────────────────────────────
+    // ── SHOW ADDRESS + QR ─────────────────────────────────────────────────────
     function showAddressQRCode(address) {
       showView('receive');
-
       const qrEl = document.getElementById('qrcode');
       qrEl.innerHTML = '';
       document.getElementById('address').innerHTML = address;
-
       new QRCode(qrEl, {
         text: `bitcoin:${address}`,
-        width: 512,
-        height: 512,
-        colorDark: '#000000',
-        colorLight: '#ffffff',
+        width: 512, height: 512,
+        colorDark: '#000000', colorLight: '#ffffff',
         correctLevel: QRCode.CorrectLevel.H
       });
     }
 
-    // ── HANDLE RECEIVE ───────────────────────────────────────────────────────
+    // ── HANDLE RECEIVE ────────────────────────────────────────────────────────
     async function handleReceive() {
       const addrData = await zsideRPC('get_new_transparent_address');
-      const transparentAddress = addrData?.result;
-      if (!transparentAddress) { alert('Failed to get new address'); return; }
+      const address  = addrData?.result;
+      if (!address) { alert('Failed to get new address'); return; }
 
-      let shieldedAddress = null;
-      let currentMode = 'transparent'; // 'transparent' | 'shielded'
+      showAddressQRCode(address);
 
-      showView('receive');
+      const addrEl    = document.getElementById('address');
+      const shieldBtn = document.createElement('button');
+      shieldBtn.innerText = 'Shield';
+      shieldBtn.className = 'shield-btn';
+      addrEl.appendChild(shieldBtn);
 
-      // Build the receive view with copy support and toggle button
-      const receiveView = document.getElementById('view-receive');
-      receiveView.innerHTML = `
-        <div id="qrcode-wrapper">
-          <div id="qrcode"></div>
-        </div>
-        <div id="address" class="deposit-address" style="margin-top:10px; max-width:600px; font-size:28px;"></div>
-        <div id="receiveCopyFeedback" class="deposit-copy-feedback">Copied!</div>
-        <button id="toggleAddressBtn" class="shield-btn" style="margin-top:20px;">SHIELD</button>
-      `;
-
-      function renderQR(addr) {
-        const qrEl = document.getElementById('qrcode');
-        qrEl.innerHTML = '';
-        new QRCode(qrEl, {
-          text: `bitcoin:${addr}`,
-          width: 512, height: 512,
-          colorDark: '#000000', colorLight: '#ffffff',
-          correctLevel: QRCode.CorrectLevel.H
-        });
-        document.getElementById('address').textContent = addr;
-      }
-
-      renderQR(transparentAddress);
-
-      const addrEl     = document.getElementById('address');
-      const feedbackEl = document.getElementById('receiveCopyFeedback');
-      const toggleBtn  = document.getElementById('toggleAddressBtn');
-
-      addrEl.style.cursor = 'pointer';
-      addrEl.addEventListener('click', async () => {
-        const current = currentMode === 'transparent' ? transparentAddress : shieldedAddress;
+      shieldBtn.addEventListener('click', async () => {
         try {
-          await navigator.clipboard.writeText(current);
-          feedbackEl.style.display = 'block';
-          setTimeout(() => feedbackEl.style.display = 'none', 1500);
-        } catch (err) { console.error(err); }
-      });
-
-      toggleBtn.addEventListener('click', async () => {
-        if (currentMode === 'transparent') {
-          // Switch to shielded
-          if (!shieldedAddress) {
-            try {
-              const shieldData = await zsideRPC('get_new_shielded_address');
-              shieldedAddress = shieldData?.result;
-              if (!shieldedAddress) { alert('Failed to get shielded address'); return; }
-            } catch (err) {
-              console.error(err);
-              alert('Error generating shielded address');
-              return;
-            }
-          }
-          currentMode = 'shielded';
-          renderQR(shieldedAddress);
-          toggleBtn.textContent = 'TRANSPARENT';
-        } else {
-          // Switch back to transparent
-          currentMode = 'transparent';
-          renderQR(transparentAddress);
-          toggleBtn.textContent = 'SHIELD';
+          const shieldData = await zsideRPC('get_new_shielded_address');
+          const shieldAddr = shieldData?.result;
+          if (!shieldAddr) { alert('Failed to get shielded address'); return; }
+          addrEl.innerText = shieldAddr;
+          const qrContainer = document.getElementById('qrcode');
+          qrContainer.innerHTML = '';
+          new QRCode(qrContainer, {
+            text: `bitcoin:${shieldAddr}`,
+            width: 512, height: 512,
+            colorDark: '#000000', colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.H
+          });
+        } catch (err) {
+          console.error(err);
+          alert('Error generating shielded address');
         }
       });
     }
 
- // ── RECEIVE BUTTON ────────────────────────────────────────────────────────
-    document.getElementById('receiveButton').addEventListener('click', () => {
-      handleReceive();
-    });
-
-    // ── SHOW DEPOSIT ─────────────────────────────────────────────────────────
+    // ── SHOW DEPOSIT ──────────────────────────────────────────────────────────
     async function showDeposit() {
       showView('deposit');
       autoShowQRCode = false;
-
       const container = document.getElementById('view-deposit');
       container.innerHTML = '';
 
       try {
-        const newAddrData = await zsideRPC('get_new_transparent_address');
-        const rawAddress  = newAddrData?.result;
+        const newAddrData    = await zsideRPC('get_new_transparent_address');
+        const rawAddress     = newAddrData?.result;
 
         if (!rawAddress || typeof rawAddress !== 'string') {
           container.innerHTML = `<p style="color:var(--color-accent-red);">Failed to get deposit address</p>`;
@@ -1016,10 +773,8 @@
           </div>
         `;
 
-        const addressEl  = document.getElementById('depositAddress');
         const feedbackEl = document.getElementById('copyFeedback');
-
-        addressEl.addEventListener('click', async () => {
+        document.getElementById('depositAddress').addEventListener('click', async () => {
           try {
             await navigator.clipboard.writeText(displayAddress);
             feedbackEl.style.display = 'block';
@@ -1030,19 +785,15 @@
         document.getElementById('depositButton').addEventListener('click', async function () {
           const amountBtc = parseFloat(document.getElementById('depositAmount').value);
           if (isNaN(amountBtc) || amountBtc <= 0) { alert('Enter a valid amount'); return; }
-
           const valueSats = btcToSats(amountBtc);
           const feeSats   = 2000;
-
           container.innerHTML += `<p style="margin-top:20px;">Creating deposit...</p>`;
           this.disabled = true;
-
           try {
             const response = await zsideRPC('create_deposit', [rawAddress, valueSats, feeSats]);
             if (response?.error) {
               container.innerHTML += `<p style="color:red;">Deposit failed</p>`;
-              this.disabled = false;
-              return;
+              this.disabled = false; return;
             }
             container.innerHTML += `<p style="color:var(--color-accent-green);">Deposit transaction created</p>`;
             zsideRPC('balance');
@@ -1062,103 +813,19 @@
       }
     }
 
-    // ── SHOW SHIELD / UNSHIELD ───────────────────────────────────────────────
-    async function showShield() {
-      showView('shield');
-
-      const container = document.getElementById('view-shield');
-      container.innerHTML = `
-        <div class="shield-card">
-          <h3 class="shield-title">Shield / Unshield</h3>
-          <div class="shield-amount-row">
-            <input type="number" id="shieldAmount" placeholder="0.00" class="shield-amount-input">
-            <span class="shield-btc-label"> BTC</span>
-          </div>
-          <div class="shield-btn-row">
-            <button id="shieldActionBtn" class="shield-action-btn">SHIELD</button>
-            <button id="unshieldActionBtn" class="shield-action-btn">UNSHIELD</button>
-          </div>
-          <div id="shieldFeedback" style="margin-top:20px; font-size:28px;"></div>
-        </div>
-      `;
-
-      async function runShieldAction(type) {
-        const feedbackEl = document.getElementById('shieldFeedback');
-        const amountBtc  = parseFloat(document.getElementById('shieldAmount').value);
-
-        if (isNaN(amountBtc) || amountBtc <= 0) { alert('Enter a valid amount'); return; }
-
-        const valueSats = btcToSats(amountBtc);
-        const feeSats   = 2000;
-        const totalSpend = valueSats + feeSats;
-
-        // Fetch latest balance for validation
-        const balData = await zsideRPC('balance');
-        const raw = balData?.result;
-        let availableSats = 0;
-
-        if (raw && typeof raw === 'object') {
-          if (type === 'shield') {
-            availableSats = parseInt(raw.total_transparent_sats ?? raw.available_transparent_sats, 10) || 0;
-          } else {
-            availableSats = parseInt(raw.total_shielded_sats ?? raw.available_shielded_sats, 10) || 0;
-          }
-        } else if (typeof raw === 'number') {
-          availableSats = Math.floor(raw);
-        }
-
-        if (totalSpend > availableSats) {
-          const label = type === 'shield' ? 'transparent' : 'shielded';
-          alert(`Not enough ${label} funds for amount + fee (${feeSats} sats)`);
-          return;
-        }
-
-        feedbackEl.innerHTML = `<p style="color:var(--color-muted);">${type === 'shield' ? 'Shielding' : 'Unshielding'}...</p>`;
-        document.getElementById('shieldActionBtn').disabled   = true;
-        document.getElementById('unshieldActionBtn').disabled = true;
-
-        try {
-          const rpcMethod = type === 'shield' ? 'shield' : 'unshield';
-          const response  = await zsideRPC(rpcMethod, [valueSats, feeSats]);
-
-          if (response?.error) {
-            feedbackEl.innerHTML = `<p style="color:var(--color-accent-red);">${type === 'shield' ? 'Shield' : 'Unshield'} failed: ${response.error.message || JSON.stringify(response.error)}</p>`;
-            document.getElementById('shieldActionBtn').disabled   = false;
-            document.getElementById('unshieldActionBtn').disabled = false;
-            return;
-          }
-
-          feedbackEl.innerHTML = `<p style="color:var(--color-accent-green);">Transaction broadcast.</p>`;
-          zsideRPC('balance');
-          zsideRPC('get_wallet_utxos');
-        } catch (err) {
-          console.error('Shield/Unshield error:', err);
-          feedbackEl.innerHTML = `<p style="color:var(--color-accent-red);">Error: ${err.message}</p>`;
-          document.getElementById('shieldActionBtn').disabled   = false;
-          document.getElementById('unshieldActionBtn').disabled = false;
-        }
-      }
-
-      document.getElementById('shieldActionBtn').addEventListener('click',   () => runShieldAction('shield'));
-      document.getElementById('unshieldActionBtn').addEventListener('click', () => runShieldAction('unshield'));
-    }
-
-    // ── SHOW SIDECHAINS ──────────────────────────────────────────────────────
+    // ── SHOW SIDECHAINS ───────────────────────────────────────────────────────
     async function showSidechainsView() {
       showView('sidechains');
       const container = document.getElementById('view-sidechains');
       container.innerHTML = `<h3>CHOOSE A SIDECHAIN:</h3><p class="sidechain-checking">Checking available sidechains...</p>`;
-
       const current = getCurrentSidechain();
       const running = await detectRunningSidechainsViaProxy();
-
       let html = '<h3>CHOOSE A SIDECHAIN:</h3><ul class="sidechain-list">';
       html += `<li class="sidechain-item" onclick="window.location.href='index.html'">Mainchain</li>`;
       running.forEach(name => {
         const lower = name.toLowerCase();
-        if (lower !== current) {
+        if (lower !== current)
           html += `<li class="sidechain-item" onclick="window.location.href='${lower}.html'">${name}</li>`;
-        }
       });
       html += '</ul>';
       container.innerHTML = html;
@@ -1177,12 +844,14 @@
       });
     });
 
-
+    // ── RECEIVE BUTTON ────────────────────────────────────────────────────────
+    document.getElementById('receiveButton').addEventListener('click', () => {
+      handleReceive();
+    });
 
     // ── CONFIRM SEND ──────────────────────────────────────────────────────────
     document.getElementById('confirm').addEventListener('click', async (e) => {
       e.preventDefault();
-
       if (unconfirmedBalance !== null) { alert('Transaction already pending confirmation'); return; }
 
       const address   = document.getElementById('btcAddress').value.trim();
@@ -1203,26 +872,11 @@
       resultDiv.innerHTML = '<p>Sending transaction...</p>';
 
       try {
-        const type = getAddressType(address);
-
-if (!type) {
-  resultDiv.innerHTML = `<p style="color:red;">Invalid address type</p>`;
-  return;
-}
-
-let response;
-
-if (type === 'transparent') {
-  response = await zsideRPC('transparent_transfer', [address, valueSats, feeSats]);
-} else {
-  response = await zsideRPC('shielded_transfer', [address, valueSats, feeSats]);
-}
-
+        const response = await zsideRPC('transfer', [address, valueSats, feeSats]);
         if (response?.error) {
           resultDiv.innerHTML = `<p style="color:red;">Transfer failed: ${response.error.message || JSON.stringify(response.error)}</p>`;
           return;
         }
-
         resultDiv.innerHTML = `<p style="color:var(--color-accent-green);">Transaction broadcast.</p>`;
 
         const newUnconfirmedBalance = confirmedBalance - totalSpend;
@@ -1232,15 +886,15 @@ if (type === 'transparent') {
         localStorage.setItem('unconfirmedBalance', unconfirmedBalance);
 
         balanceEl.innerHTML = '0 BTC';
-
         let unconfirmedEl = document.getElementById('unconfirmedBalance');
         if (!unconfirmedEl) {
           unconfirmedEl = document.createElement('div');
           unconfirmedEl.id = 'unconfirmedBalance';
           balanceEl.after(unconfirmedEl);
         }
-        const btc = (newUnconfirmedBalance / 1e8).toFixed(8).replace(/\.?0+$/, '');
-        unconfirmedEl.innerHTML = renderUnconfirmedPill(btc);
+        unconfirmedEl.innerHTML = renderUnconfirmedPill(
+          (newUnconfirmedBalance / 1e8).toFixed(8).replace(/\.?0+$/, '')
+        );
 
         zsideRPC('balance');
         zsideRPC('get_wallet_utxos');
@@ -1262,9 +916,7 @@ if (type === 'transparent') {
       });
       reader.classList.remove('hidden');
       reader.style.visibility = 'visible';
-
       if (!scanner) scanner = new Html5Qrcode('reader');
-
       try {
         await scanner.start(
           { facingMode: 'environment' },
@@ -1284,7 +936,6 @@ if (type === 'transparent') {
       let parts   = clean.split('?');
       let address = parts[0].trim();
       let amount  = parts[1] ? new URLSearchParams(parts[1]).get('amount') : null;
-
       if (isValidzsideAddress(address)) {
         document.getElementById('btcAddress').value = address;
         if (amount) document.getElementById('amount').value = amount;
@@ -1293,7 +944,7 @@ if (type === 'transparent') {
           if (el) el.style.visibility = 'visible';
         });
       } else {
-        alert('Invalid address (expected 25–32 character zSide address)');
+        alert('Invalid address (expected 25–32 character mainchain address)');
       }
     }
 
@@ -1321,18 +972,9 @@ if (type === 'transparent') {
     }
 
     // ── HELPERS ───────────────────────────────────────────────────────────────
-function isValidzsideAddress(address) {
-  const transparent = /^[1-9A-HJ-NP-Za-km-z]{25,32}$/;
-  const shielded = /^t-shld1[0-9a-z]{50,120}$/;
-
-  return transparent.test(address) || shielded.test(address);
-}
-
-function getAddressType(address) {
-  if (/^t-shld1[0-9a-z]{50,120}$/.test(address)) return 'shielded';
-  if (/^[1-9A-HJ-NP-Za-km-z]{25,32}$/.test(address)) return 'transparent';
-  return null;
-}
+    function isValidzsideAddress(address) {
+      return /^[1-9A-HJ-NP-Za-km-z]{25,32}$/.test(address);
+    }
 
     function btcToSats(btc) { return Math.floor(btc * 1e8); }
 
@@ -1342,21 +984,19 @@ function getAddressType(address) {
 
     async function detectRunningSidechainsViaProxy() {
       const sidechains = [
-        { name: 'BitNames',    proxy: 'bitnames' },
-        { name: 'BitAssets',   proxy: 'bitassets' },
-        { name: 'Thunder',     proxy: 'thunder' },
-        { name: 'Truthcoin-DC',proxy: 'truthcoin-dc' },
-        { name: 'zSide',       proxy: 'zside' },
-        { name: 'Photon',      proxy: 'photon' },
-        { name: 'Coinshift',   proxy: 'coinshift' }
+        { name: 'BitNames',     proxy: 'bitnames' },
+        { name: 'BitAssets',    proxy: 'bitassets' },
+        { name: 'Thunder',      proxy: 'thunder' },
+        { name: 'Truthcoin-DC', proxy: 'truthcoin-dc' },
+        { name: 'zSide',        proxy: 'zside' },
+        { name: 'Photon',       proxy: 'photon' },
+        { name: 'Coinshift',    proxy: 'coinshift' }
       ];
-
       const running = [];
       for (const sc of sidechains) {
         try {
           const res = await fetch(`/${sc.proxy}/ping`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'ping' })
           });
           if (res.status !== 404 && res.status !== 502) running.push(sc.name);
@@ -1373,9 +1013,7 @@ function getAddressType(address) {
       timer = setInterval(() => zsideRPC('balance'), 5000);
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      startTimers();
-    });
+    document.addEventListener('DOMContentLoaded', () => { startTimers(); });
 
   </script>
 </html>

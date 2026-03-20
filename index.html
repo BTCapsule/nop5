@@ -32,15 +32,14 @@
       --font-ui:    sans-serif;
       --font-mono:  Consolas, monospace;
 
-      --fs-title:   60px;
-      --fs-balance: 100px;
-      --fs-body:    34px;
-      --fs-input:   32px;
-      --fs-amount:  80px;
-      --fs-btc:     60px;
-      --fs-btn:     24px;
-      --fs-confirm: 50px;
-      --fs-tx:      46px;
+      --fs-title:          60px;
+      --fs-balance:        100px;
+      --fs-body:           34px;
+      --fs-input:          32px;
+      --fs-amount:         80px;
+      --fs-btc:            60px;
+      --fs-btn:            24px;
+      --fs-confirm:        50px;
       --fs-sidechain-item: 48px;
 
       --btn-padding: 20px 25px;
@@ -57,52 +56,20 @@
       padding: 0;
     }
 
-    h2 {
-      color: var(--color-fg);
-      font-size: var(--fs-title);
-      font-family: var(--font-ui);
-      margin-bottom: 20px;
-      margin-left: 40px;
-      margin-top: 20px;
-    }
-
-    li {
-      list-style: none;
-    }
+    li { list-style: none; }
 
     /* =============================================
        TABLES
     ============================================= */
-    th, td {
-      padding: 15px;
-      text-align: left;
-    }
-
-    table, th, td {
-      border: 1px solid var(--color-border);
-    }
-
-    th {
-      background-color: var(--color-bg);
-      color: var(--color-fg);
-    }
-
-    tr:hover {
-      background-color: #D6EEEE;
-    }
-
-    tr:nth-child(even) {
-      background-color: var(--color-bg);
-      color: var(--color-fg);
-    }
-
-    .center-table {
-      margin-left: auto;
-      margin-right: auto;
-    }
+    th, td { padding: 15px; text-align: left; }
+    table, th, td { border: 1px solid var(--color-border); }
+    th { background-color: var(--color-bg); color: var(--color-fg); }
+    tr:hover { background-color: #D6EEEE; }
+    tr:nth-child(even) { background-color: var(--color-bg); color: var(--color-fg); }
+    .center-table { margin-left: auto; margin-right: auto; }
 
     /* =============================================
-       BUTTONS
+       BUTTONS (general)
     ============================================= */
     button {
       background-color: var(--color-fg);
@@ -118,10 +85,96 @@
     }
 
     /* =============================================
-       LAYOUT: CHROME (header, top nav, bottom nav)
+       HEADER BAR
     ============================================= */
+    #header-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 40px 0 40px;
+    }
 
-    /* Balance display */
+    #page-title {
+      color: var(--color-fg);
+      font-size: var(--fs-title);
+      font-family: var(--font-ui);
+      margin: 0;
+    }
+
+    /* The "···" trigger button */
+    #menu-trigger {
+      font-size: 52px;
+      font-family: var(--font-ui);
+      color: var(--color-fg);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px 12px;
+      margin: 0;
+      line-height: 1;
+      letter-spacing: 6px;
+    }
+
+    /* =============================================
+       SIDE MENU OVERLAY
+    ============================================= */
+    #menu-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+    }
+
+    #menu-overlay.open { display: block; }
+
+    /* Dim backdrop */
+    #menu-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.55);
+    }
+
+    /* Drawer slides in from right */
+    #menu-drawer {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 360px;
+      height: 100%;
+      background: #111111;
+      border-left: 1px solid var(--color-dim);
+      display: flex;
+      flex-direction: column;
+      padding: 50px 0;
+      box-sizing: border-box;
+      transform: translateX(100%);
+      transition: transform 0.22s ease;
+    }
+
+    #menu-overlay.open #menu-drawer {
+      transform: translateX(0);
+    }
+
+    .menu-item {
+      font-family: var(--font-ui);
+      font-size: 42px;
+      color: var(--color-fg);
+      padding: 28px 48px;
+      cursor: pointer;
+      border: none;
+      background: none;
+      text-align: left;
+      width: 100%;
+      margin: 0;
+      transition: background 0.15s;
+      display: block;
+    }
+
+    .menu-item:hover { background: var(--color-dim); }
+
+    /* =============================================
+       LAYOUT: CHROME
+    ============================================= */
     #balance {
       color: var(--color-fg);
       font-size: var(--fs-balance);
@@ -130,41 +183,42 @@
       margin-top: 30px;
     }
 
-    /* Top navigation buttons */
-    #button-container {
-      display: flex;
-      justify-content: center;
-    }
-
-    /* Bottom RECEIVE / SEND buttons — fixed to viewport bottom */
+    /* Bottom RECEIVE / SEND — fixed, 170px from bottom */
     #button-container2 {
       position: fixed;
-      bottom: 20px;
+      bottom: 170px;
       left: 0;
       right: 0;
       display: flex;
       justify-content: center;
       align-items: center;
+      gap: 30px;
       z-index: 100;
+    }
+
+    #receiveButton,
+    #sendButton {
+      font-size: 42px;
+      padding: 30px 60px;
+      border-radius: 16px;
+      margin: 0;
+      width: auto;
     }
 
     /* =============================================
        LAYOUT: MIDDLE PANEL
-       This is the single zone all views render into.
-       All view panels are display:none by default;
-       JS shows the active one.
     ============================================= */
     #panel {
       display: flex;
       justify-content: center;
       align-items: flex-start;
       min-height: 400px;
-      padding-bottom: 120px; /* clear fixed bottom buttons */
+      padding-bottom: 300px;
       margin-top: 15px;
     }
 
     /* =============================================
-       VIEW: INFO / TRANSACTIONS  (#view-info)
+       VIEW: INFO / TRANSACTIONS
     ============================================= */
     #view-info {
       display: none;
@@ -179,55 +233,18 @@
       max-width: 900px;
     }
 
-    /* Transaction list */
-    .tx-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-
-    .tx-item {
-      padding: 12px 0;
-      border-bottom: 1px solid var(--color-dim);
-    }
-
-    .tx-row {
-      display: flex;
-      align-items: center;
-      gap: 300px;
-    }
-
-    .tx-id {
-      color: var(--color-accent-blue);
-      font-weight: bold;
-    }
-
-    .tx-amount-out {
-      color: var(--color-accent-red);
-      font-weight: bold;
-    }
-
-    .tx-amount-in {
-      color: var(--color-accent-green);
-      font-weight: bold;
-    }
-
-    .tx-amount-unknown {
-      color: var(--color-muted);
-    }
-
-    .tx-time {
-      color: var(--color-muted);
-      font-size: 0.85em;
-      margin-top: 4px;
-    }
-
-    .tx-empty {
-      color: var(--color-accent-red);
-    }
+    .tx-list  { list-style: none; padding: 0; margin: 0; }
+    .tx-item  { padding: 12px 0; border-bottom: 1px solid var(--color-dim); }
+    .tx-row   { display: flex; align-items: center; gap: 300px; }
+    .tx-id    { color: var(--color-accent-blue); font-weight: bold; }
+    .tx-amount-out     { color: var(--color-accent-red);   font-weight: bold; }
+    .tx-amount-in      { color: var(--color-accent-green); font-weight: bold; }
+    .tx-amount-unknown { color: var(--color-muted); }
+    .tx-time  { color: var(--color-muted); font-size: 0.85em; margin-top: 4px; }
+    .tx-empty { color: var(--color-accent-red); }
 
     /* =============================================
-       VIEW: RECEIVE / QR CODE  (#view-receive)
+       VIEW: RECEIVE / QR CODE
     ============================================= */
     #view-receive {
       display: none;
@@ -244,9 +261,7 @@
       height: 512px;
     }
 
-    #qrcode {
-      text-align: center;
-    }
+    #qrcode { text-align: center; }
 
     #address {
       color: var(--color-fg);
@@ -258,7 +273,7 @@
     }
 
     /* =============================================
-       VIEW: SEND FORM  (#view-send)
+       VIEW: SEND FORM
     ============================================= */
     #view-send {
       display: none;
@@ -266,7 +281,6 @@
       align-items: center;
     }
 
-    /* Amount row */
     .amount-row {
       display: flex;
       align-items: center;
@@ -324,14 +338,10 @@
       color: var(--color-bg);
     }
 
-    /* QR Scanner inside send view */
-    #reader {
-      width: 700px;
-      height: 500px;
-    }
+    #reader { width: 700px; height: 500px; }
 
     /* =============================================
-       VIEW: SIDECHAINS  (#view-sidechains)
+       VIEW: SIDECHAINS
     ============================================= */
     #view-sidechains {
       display: none;
@@ -374,7 +384,7 @@
     }
 
     /* =============================================
-       VIEW: CREATE WALLET  (#view-create-wallet)
+       VIEW: CREATE WALLET
     ============================================= */
     #view-create-wallet {
       display: none;
@@ -414,7 +424,7 @@
     }
 
     /* =============================================
-       VIEW: MNEMONIC  (#view-mnemonic)
+       VIEW: MNEMONIC
     ============================================= */
     #view-mnemonic {
       display: none;
@@ -432,8 +442,7 @@
     }
 
     /* =============================================
-       VIEW: RESULT  (#view-result)
-       Generic text / status output view
+       VIEW: RESULT
     ============================================= */
     #view-result {
       display: none;
@@ -450,23 +459,16 @@
     }
 
     /* =============================================
-       JSON VIEWER SYNTAX HIGHLIGHTING
+       JSON VIEWER
     ============================================= */
-    .json-viewer pre {
-      white-space: pre-wrap;
-      word-wrap: break-word;
-    }
-
-    .json-key     { color: var(--color-accent-blue);  font-weight: bold; }
+    .json-viewer pre { white-space: pre-wrap; word-wrap: break-word; }
+    .json-key     { color: var(--color-accent-blue); font-weight: bold; }
     .json-string  { color: #ce9178; }
     .json-number  { color: #b5cea8; }
     .json-boolean { color: #569cd6; }
     .json-null    { color: #569cd6; font-style: italic; }
     .json-keyword { color: #569cd6; }
 
-    /* =============================================
-       COLLAPSIBLE DETAILS
-    ============================================= */
     details summary { list-style: none; }
     details summary::-webkit-details-marker { display: none; }
     details summary::before       { content: "▶ "; color: var(--color-accent-green); }
@@ -476,24 +478,10 @@
        UTILITY
     ============================================= */
     .hidden { display: none !important; }
+    #html5-qrcode-button-camera-stop { display: none; }
 
-    /* Hide the html5-qrcode stop button — it's controlled programmatically */
-    #html5-qrcode-button-camera-stop {
-      display: none;
-    }
-
-    /* Popup (unused visually but kept for completeness) */
-    #popup {
-      position: absolute;
-      width: 400px;
-      height: 900px;
-      background-color: var(--color-fg);
-    }
-
-    #dawg {
-      background-color: var(--color-bg);
-      height: 500px;
-    }
+    #popup { position: absolute; width: 400px; height: 900px; background-color: var(--color-fg); }
+    #dawg  { background-color: var(--color-bg); height: 500px; }
 
     .sidechain-button {
       background-color: var(--color-fg);
@@ -509,16 +497,21 @@
 
   <body>
 
-    <!-- ── HEADER ─────────────────────────────── -->
-    <h2 class="exclude">Mainchain</h2>
-    <br><br>
+    <!-- ── HEADER BAR ─────────────────────────── -->
+    <div id="header-bar" class="exclude">
+      <h2 id="page-title" class="exclude">Mainchain</h2>
+      <button id="menu-trigger" class="exclude">···</button>
+    </div>
 
-    <!-- ── TOP NAV BUTTONS ───────────────────── -->
-    <div id="button-container" class="exclude">
-      <button id="displayBalance" onclick="rpc('wallet', 'GetBalance')">balance</button>
-      <button onclick="showView('info'); rpc('wallet', 'ListTransactions')">info</button>
-      <button onclick="rpc('wallet', 'CreateNewAddress')">address</button>
-      <button onclick="rpc('validator', 'GetSidechains')">sidechains</button>
+    <!-- ── SIDE MENU OVERLAY ─────────────────── -->
+    <div id="menu-overlay">
+      <div id="menu-backdrop"></div>
+      <div id="menu-drawer">
+        <button class="menu-item exclude" onclick="menuAction(() => rpc('wallet', 'GetBalance'))">balance</button>
+        <button class="menu-item exclude" onclick="menuAction(() => { showView('info'); rpc('wallet', 'ListTransactions'); })">info</button>
+        <button class="menu-item exclude" onclick="menuAction(() => rpc('wallet', 'CreateNewAddress'))">address</button>
+        <button class="menu-item exclude" onclick="menuAction(() => rpc('validator', 'GetSidechains'))">sidechains</button>
+      </div>
     </div>
 
     <!-- ── BALANCE ────────────────────────────── -->
@@ -526,27 +519,19 @@
     <br><br>
 
     <!-- ══════════════════════════════════════════
-         MIDDLE PANEL — one zone, all views live here
+         MIDDLE PANEL
     ═══════════════════════════════════════════ -->
     <div id="panel">
 
-      <!-- VIEW: INFO / TRANSACTIONS -->
-      <div id="view-info">
-        <!-- populated by showInfo() -->
-      </div>
+      <div id="view-info"></div>
 
-      <!-- VIEW: RECEIVE -->
       <div id="view-receive">
-        <div id="qrcode-wrapper">
-          <div id="qrcode"></div>
-        </div>
+        <div id="qrcode-wrapper"><div id="qrcode"></div></div>
         <div id="address"></div>
       </div>
 
-      <!-- VIEW: SEND -->
       <div id="view-send">
         <div id="reader" class="hidden"></div>
-
         <div id="btcForm">
           <div class="amount-row">
             <input type="number" id="amount" name="amount" min="0" value="0" maxlength="15">
@@ -562,34 +547,23 @@
         </div>
       </div>
 
-      <!-- VIEW: SIDECHAINS -->
-      <div id="view-sidechains">
-        <!-- populated by showSidechains() -->
-      </div>
+      <div id="view-sidechains"></div>
 
-      <!-- VIEW: CREATE WALLET -->
       <div id="view-create-wallet">
         <input type="text" id="walletName" placeholder="Enter wallet name">
         <br><br>
         <button id="confirmWalletCreation">NEXT</button>
       </div>
 
-      <!-- VIEW: MNEMONIC -->
-      <div id="view-mnemonic">
-        <!-- populated dynamically -->
-      </div>
-
-      <!-- VIEW: GENERIC RESULT -->
-      <div id="view-result">
-        <!-- populated for send confirmations, errors, etc. -->
-      </div>
+      <div id="view-mnemonic"></div>
+      <div id="view-result"></div>
 
     </div><!-- /#panel -->
 
     <!-- ── BOTTOM FIXED NAV ───────────────────── -->
     <div id="button-container2" class="exclude">
-      <button class="exclude" id="receiveButton">RECEIVE</button>
-      <button style="width:155px;" id="sendButton" class="exclude">SEND</button>
+      <button id="receiveButton" class="exclude">RECEIVE</button>
+      <button id="sendButton"    class="exclude">SEND</button>
     </div>
 
   </body>
@@ -601,25 +575,32 @@
     let confirmedBalance = 0;
     let unconfirmedBalance = 0;
 
-    // ── VIEW MANAGER ────────────────────────────────────────────────────────
-    // All middle-panel views. showView() hides all then shows the target.
+    // ── MENU ─────────────────────────────────────────────────────────────────
+    const menuOverlay = document.getElementById('menu-overlay');
+
+    document.getElementById('menu-trigger').addEventListener('click', () => {
+      menuOverlay.classList.add('open');
+    });
+
+    document.getElementById('menu-backdrop').addEventListener('click', () => {
+      menuOverlay.classList.remove('open');
+    });
+
+    function menuAction(fn) {
+      menuOverlay.classList.remove('open');
+      fn();
+    }
+
+    // ── VIEW MANAGER ─────────────────────────────────────────────────────────
     const ALL_VIEWS = [
-      'view-info',
-      'view-receive',
-      'view-send',
-      'view-sidechains',
-      'view-create-wallet',
-      'view-mnemonic',
-      'view-result',
+      'view-info', 'view-receive', 'view-send', 'view-sidechains',
+      'view-create-wallet', 'view-mnemonic', 'view-result',
     ];
 
     function showView(name) {
-      ALL_VIEWS.forEach(id => {
-        document.getElementById(id).style.display = 'none';
-      });
+      ALL_VIEWS.forEach(id => { document.getElementById(id).style.display = 'none'; });
       const el = document.getElementById('view-' + name);
       if (el) {
-        // flex for views that use flex layout, block otherwise
         const flexViews = ['receive', 'send', 'sidechains', 'create-wallet', 'mnemonic'];
         el.style.display = flexViews.includes(name) ? 'flex' : 'block';
       }
@@ -650,7 +631,6 @@
           showAddressQRCode(data.result.address);
           console.log(data.result.address);
         }
-
         return data;
       } catch (err) {
         console.error(`RPC Error: ${category}/${method}`, err);
@@ -658,7 +638,7 @@
       }
     }
 
-    // ── SHOW INFO (transactions) ─────────────────────────────────────────────
+    // ── SHOW INFO ─────────────────────────────────────────────────────────────
     function showInfo(info) {
       showView('info');
       const container = document.getElementById('view-info');
@@ -669,33 +649,25 @@
         return;
       }
 
-      const sortedTxs = [...info.transactions].sort((a, b) => {
-        return (b.confirmationInfo?.height || 0) - (a.confirmationInfo?.height || 0);
-      });
-
-      const recentTxs = sortedTxs.slice(0, 5);
+      const sortedTxs = [...info.transactions].sort((a, b) =>
+        (b.confirmationInfo?.height || 0) - (a.confirmationInfo?.height || 0)
+      );
       const ul = document.createElement('ul');
       ul.className = 'tx-list';
 
-      recentTxs.forEach(tx => {
+      sortedTxs.slice(0, 5).forEach(tx => {
         const li = document.createElement('li');
         li.className = 'tx-item';
-
         const shortTxid = tx.txid?.hex?.substring(0, 6) || '??????';
-
         let amountHTML = '';
         if (tx.sentSats) {
-          const sats = parseInt(tx.sentSats, 10);
-          amountHTML = `<span class="tx-amount-out">-${(sats / 1e8).toFixed(8)} BTC</span>`;
+          amountHTML = `<span class="tx-amount-out">-${(parseInt(tx.sentSats, 10) / 1e8).toFixed(8)} BTC</span>`;
         } else if (tx.receivedSats) {
-          const sats = parseInt(tx.receivedSats, 10);
-          amountHTML = `<span class="tx-amount-in">+${(sats / 1e8).toFixed(8)} BTC</span>`;
+          amountHTML = `<span class="tx-amount-in">+${(parseInt(tx.receivedSats, 10) / 1e8).toFixed(8)} BTC</span>`;
         } else {
           amountHTML = `<span class="tx-amount-unknown">?</span>`;
         }
-
         const time = tx.confirmationInfo?.timestamp || 'unconfirmed';
-
         li.innerHTML = `
           <div class="tx-row">
             <div><span class="tx-id">${shortTxid}...</span></div>
@@ -705,62 +677,48 @@
         `;
         ul.appendChild(li);
       });
-
       container.appendChild(ul);
     }
 
-    // ── SHOW ADDRESS + QR CODE ───────────────────────────────────────────────
+    // ── SHOW ADDRESS + QR ─────────────────────────────────────────────────────
     function showAddressQRCode(address) {
       showView('receive');
-
       const qrEl = document.getElementById('qrcode');
       qrEl.innerHTML = '';
-
       document.getElementById('address').textContent = address;
-
       new QRCode(qrEl, {
         text: `bitcoin:${address}`,
-        width: 512,
-        height: 512,
-        colorDark: '#000000',
-        colorLight: '#ffffff',
+        width: 512, height: 512,
+        colorDark: '#000000', colorLight: '#ffffff',
         correctLevel: QRCode.CorrectLevel.H
       });
     }
 
-    // ── SHOW SIDECHAINS ──────────────────────────────────────────────────────
+    // ── SHOW SIDECHAINS ───────────────────────────────────────────────────────
     async function showSidechainsView() {
       showView('sidechains');
       const container = document.getElementById('view-sidechains');
-      container.innerHTML = `
-        <h3>CHOOSE A SIDECHAIN:</h3>
-        <p class="sidechain-checking">Checking available sidechains...</p>
-      `;
-
+      container.innerHTML = `<h3>CHOOSE A SIDECHAIN:</h3><p class="sidechain-checking">Checking available sidechains...</p>`;
       const current = getCurrentSidechain();
       const running = await detectRunningSidechainsViaProxy();
-
       let html = '<h3>CHOOSE A SIDECHAIN:</h3><ul class="sidechain-list">';
       html += `<li class="sidechain-item" onclick="window.location.href='index.html'">Mainchain</li>`;
       running.forEach(name => {
         const lower = name.toLowerCase();
-        if (lower !== current) {
+        if (lower !== current)
           html += `<li class="sidechain-item" onclick="window.location.href='${lower}.html'">${name}</li>`;
-        }
       });
       html += '</ul>';
       container.innerHTML = html;
     }
 
-    // ── SHOW SEND FORM ────────────────────────────────────────────────────────
+    // ── SEND BUTTON ───────────────────────────────────────────────────────────
     document.getElementById('sendButton').addEventListener('click', () => {
       showView('send');
       document.getElementById('reader').classList.add('hidden');
       document.getElementById('btcAddress').value = '';
       document.getElementById('amount').value = '0';
       document.getElementById('btcForm').style.display = 'block';
-
-      // Reset send form visibility
       ['btcAddress', 'amount', 'scanButton', 'btc-label', 'confirm'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.style.visibility = 'visible';
@@ -775,38 +733,20 @@
     // ── CONFIRM SEND ──────────────────────────────────────────────────────────
     document.getElementById('confirm').addEventListener('click', async (e) => {
       e.preventDefault();
-
       const address   = document.getElementById('btcAddress').value.trim();
       const amountBtc = parseFloat(document.getElementById('amount').value);
-
-      if (!isValidBitcoinAddress(address)) {
-        alert('Invalid Bitcoin, Testnet, or Signet address');
-        return;
-      }
-      if (isNaN(amountBtc) || amountBtc <= 0) {
-        alert('Enter a valid amount');
-        return;
-      }
-
+      if (!isValidBitcoinAddress(address)) { alert('Invalid Bitcoin, Testnet, or Signet address'); return; }
+      if (isNaN(amountBtc) || amountBtc <= 0) { alert('Enter a valid amount'); return; }
       const amountSats = Math.floor(amountBtc * 1e8);
-      const txRequest  = {
-        destinations: { [address]: amountSats },
-        feeRate: { sat_per_vbyte: 10 }
-      };
-
+      const txRequest  = { destinations: { [address]: amountSats }, feeRate: { sat_per_vbyte: 10 } };
       showView('result');
       const resultDiv = document.getElementById('view-result');
-      const singleQuotedJson = `'${JSON.stringify(txRequest, null, 2)}'`;
-      resultDiv.innerHTML = `<p>Sending ${amountBtc} BTC to ${address}...</p><pre>${singleQuotedJson}</pre>`;
-
+      resultDiv.innerHTML = `<p>Sending ${amountBtc} BTC to ${address}...</p><pre>'${JSON.stringify(txRequest, null, 2)}'</pre>`;
       try {
         const res  = await fetch('/wallet/SendTransaction', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(txRequest)
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(txRequest)
         });
         const data = await res.json();
-
         if (data.error) {
           resultDiv.innerHTML += `<p style="color:var(--color-accent-red);">Transaction failed: ${data.error}</p>`;
         } else {
@@ -815,7 +755,7 @@
           rpc('wallet', 'ListTransactions');
         }
       } catch (err) {
-        resultDiv.innerHTML += `<p style="color:var(--color-accent-red);">Error sending transaction: ${err.message}</p>`;
+        resultDiv.innerHTML += `<p style="color:var(--color-accent-red);">Error: ${err.message}</p>`;
       }
     });
 
@@ -824,18 +764,13 @@
 
     document.getElementById('scanButton').addEventListener('click', async () => {
       const reader = document.getElementById('reader');
-
-      // Hide send form elements so camera takes over
       ['btcAddress', 'amount', 'scanButton', 'btc-label', 'confirm'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.style.visibility = 'hidden';
       });
-
       reader.classList.remove('hidden');
       reader.style.visibility = 'visible';
-
       if (!scanner) scanner = new Html5Qrcode('reader');
-
       try {
         await scanner.start(
           { facingMode: 'environment' },
@@ -845,23 +780,19 @@
             scanner.stop();
             reader.classList.add('hidden');
           },
-          () => {} // ignore scan errors
+          () => {}
         );
-      } catch (err) {
-        console.error('Camera start failed:', err);
-      }
+      } catch (err) { console.error('Camera start failed:', err); }
     });
 
     function handleScannedText(text) {
-      let clean  = text.replace(/^[a-zA-Z]+:/, '');
+      let clean   = text.replace(/^[a-zA-Z]+:/, '');
       let parts   = clean.split('?');
       let address = parts[0];
       let amount  = parts[1] ? new URLSearchParams(parts[1]).get('amount') : null;
-
       if (isValidBitcoinAddress(address)) {
         document.getElementById('btcAddress').value = address;
         if (amount) document.getElementById('amount').value = amount;
-        // Restore send form elements after scan
         ['btcAddress', 'amount', 'scanButton', 'btc-label', 'confirm'].forEach(id => {
           const el = document.getElementById(id);
           if (el) el.style.visibility = 'visible';
@@ -876,38 +807,31 @@
       return /^(bc1|tb1|sb1|[13])[a-zA-HJ-NP-Z0-9]{20,100}$/.test(address);
     }
 
-    function btcToSats(btc) {
-      return Math.floor(btc * 1e8);
-    }
+    function btcToSats(btc) { return Math.floor(btc * 1e8); }
 
     function getCurrentSidechain() {
-      let page = window.location.pathname.split('/').pop();
-      return page.replace('.html', '').toLowerCase();
+      return window.location.pathname.split('/').pop().replace('.html', '').toLowerCase();
     }
 
     async function detectRunningSidechainsViaProxy() {
       const sidechains = [
-        { name: 'BitNames',    proxy: 'bitnames' },
-        { name: 'BitAssets',   proxy: 'bitassets' },
-        { name: 'Thunder',     proxy: 'thunder' },
-        { name: 'Truthcoin-DC',proxy: 'truthcoin-dc' },
-        { name: 'ZSide',       proxy: 'zside' },
-        { name: 'Photon',      proxy: 'photon' },
-        { name: 'Coinshift',   proxy: 'coinshift' }
+        { name: 'BitNames',     proxy: 'bitnames' },
+        { name: 'BitAssets',    proxy: 'bitassets' },
+        { name: 'Thunder',      proxy: 'thunder' },
+        { name: 'Truthcoin-DC', proxy: 'truthcoin-dc' },
+        { name: 'ZSide',        proxy: 'zside' },
+        { name: 'Photon',       proxy: 'photon' },
+        { name: 'Coinshift',    proxy: 'coinshift' }
       ];
-
       const running = [];
       for (const sc of sidechains) {
         try {
           const res = await fetch(`/${sc.proxy}/ping`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'ping' })
           });
           if (res.status !== 404 && res.status !== 502) running.push(sc.name);
-        } catch (err) {
-          console.log(`${sc.name} backend not reachable`, err.message);
-        }
+        } catch (err) { console.log(`${sc.name} backend not reachable`, err.message); }
       }
       return running;
     }
@@ -920,9 +844,7 @@
       timer = setInterval(() => rpc('wallet', 'GetBalance'), 5000);
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      startTimers();
-    });
+    document.addEventListener('DOMContentLoaded', () => { startTimers(); });
 
   </script>
 </html>
